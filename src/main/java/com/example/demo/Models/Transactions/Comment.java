@@ -21,9 +21,5 @@ public class Comment {
 
     private String text;
 
-    @OneToOne
-    private Transaction transaction;
-
-
 
 }

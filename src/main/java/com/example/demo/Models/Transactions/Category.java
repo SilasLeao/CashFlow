@@ -1,7 +1,8 @@
 package com.example.demo.Models.Transactions;
 
 
-import com.example.demo.Models.enums.Categorys;
+import com.example.demo.Models.enums.Nature;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,16 +23,18 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    private Categorys categorys;
+    private String name;
 
-    //private String name;
-    //private String nature;
-    private Boolean isTrue;
+    @Enumerated(EnumType.STRING)
+    private Nature nature;
 
-    @OneToMany
-    private List<Transaction> transactions;
+    private Boolean active;
 
     private Integer order;
 
+    
+    @OneToMany(mappedBy = "category", cascade = {CascadeType.REMOVE,
+            CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
+    private List<Transaction> transactions;
 
 }
