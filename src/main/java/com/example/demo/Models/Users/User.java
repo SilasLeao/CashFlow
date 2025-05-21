@@ -22,14 +22,14 @@ public class User {
 
     private String name;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE,
-            CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
-    private List<Account> accounts;
-
     private PasswordEncoder password;
 
     private String login;
 
     private String type;
+
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE,
+            CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
+    private List<Account> accounts;
 
 }

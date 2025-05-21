@@ -3,6 +3,8 @@ package com.example.demo.Models.Accounts;
 
 import com.example.demo.Models.Transactions.Transaction;
 import com.example.demo.Models.Users.User;
+import com.example.demo.Models.enums.AccountType;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,18 +26,20 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    private List<Transaction> transactions;
-
+    @ManyToOne
     private User user;
 
     private String number;
 
     private String description;
 
-    private String type;
-
+    @Enumerated(EnumType.STRING)
+    private AccountType type;
 
     private Date finishDay;
+
+    @ManyToMany(mappedBy = "accounts")
+    private List<Transaction> transactions;
 
 
 
