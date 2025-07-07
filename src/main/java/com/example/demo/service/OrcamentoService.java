@@ -23,7 +23,7 @@ public class OrcamentoService {
         Map<Nature, List<OrcamentoLinha>> resultado = new LinkedHashMap<>();
 
         for (Nature natureza : Nature.values()) {
-            List<Category> categorias = categoryRepository.findByNatureOrderByOrderAsc(natureza);
+            List<Category> categorias = categoryRepository.findByNatureOrderByOrderIndexAsc(natureza);
             List<OrcamentoLinha> linhas = new ArrayList<>();
 
             for (Category cat : categorias) {

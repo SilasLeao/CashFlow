@@ -39,8 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/user/dashboard")
-    public String showDashboard(Model model) {
-        User user = getUsuarioSimulado(); // Troque por autenticação real depois
+    public String showDashboard(Model model, User user) {
         model.addAttribute("user", user);
         return "user/dashboard";
     }

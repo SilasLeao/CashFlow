@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,6 +27,8 @@ public class Transaction {
     private String description;
 
     private Double value;
+
+    private Date date;
 
     @Enumerated(EnumType.STRING)
     private MovementType movement;
