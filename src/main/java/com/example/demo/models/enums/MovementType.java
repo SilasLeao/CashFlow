@@ -1,4 +1,4 @@
-package com.example.demo.Models.enums;
+package com.example.demo.models.enums;
 
 public enum MovementType {
     CREDITO,
