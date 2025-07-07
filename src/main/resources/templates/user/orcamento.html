@@ -1,0 +1,22 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="main :: content">
+<div >
+    <h2>Orçamento Anual</h2>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Categoria</th>
+            <th th:each="mes : ${meses}" th:text="${mes}">Jan</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="cat : ${categorias}">
+            <td th:text="${cat.name}"></td>
+            <td th:each="mes : ${meses}" th:text="${cat.valores[mes]} ?: 0.0">0.0</td>
+            <td th:text="${cat.total}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</html>

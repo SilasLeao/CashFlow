@@ -1,0 +1,29 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="main :: content">
+<div>
+    <h2>Categorias</h2>
+    <a href="/admin/categorias/nova" class="btn btn-success mb-3">Nova Categoria</a>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Natureza</th>
+            <th>Ativa</th>
+            <th>Ordem</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="cat : ${categorias}">
+            <td th:text="${cat.name}"></td>
+            <td th:text="${cat.nature}"></td>
+            <td th:text="${cat.active ? 'Sim' : 'Não'}"></td>
+            <td th:text="${cat.order}"></td>
+            <td>
+                <a th:href="@{'/admin/categorias/' + ${cat.id} + '/editar'}" class="btn btn-warning btn-sm">Editar</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</html>

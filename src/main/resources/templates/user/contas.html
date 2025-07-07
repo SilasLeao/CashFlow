@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="main :: content">
+<div th:replace="layout/main :: body">
+    <h2>Minhas Contas</h2>
+    <a href="/contas/nova" class="btn btn-success mb-3">Nova Conta</a>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Número</th>
+            <th>Descrição</th>
+            <th>Tipo</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="conta : ${contas}">
+            <td th:text="${conta.number}"></td>
+            <td th:text="${conta.description}"></td>
+            <td th:text="${conta.type}"></td>
+            <td>
+                <a th:href="@{'/contas/' + ${conta.id} + '/transacoes'}" class="btn btn-sm btn-info">Ver Transações</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</html>

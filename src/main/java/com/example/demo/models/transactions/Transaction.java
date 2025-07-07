@@ -1,4 +1,4 @@
-package com.example.demo.Models.Transactions;
+package com.example.demo.models.transactions;
 
 
 import jakarta.persistence.*;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
-import com.example.demo.Models.Accounts.Account;
-import com.example.demo.Models.enums.MovementType;
+import com.example.demo.models.accounts.Account;
+import com.example.demo.models.enums.MovementType;
 
 @Table(name = "Transaction")
 @Entity

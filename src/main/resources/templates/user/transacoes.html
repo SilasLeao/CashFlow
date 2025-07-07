@@ -1,0 +1,29 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="main :: content">
+<div>
+    <h2>Transações</h2>
+    <a th:href="@{'/contas/' + ${conta.id} + '/transacoes/nova'}" class="btn btn-success mb-3">Nova Transação</a>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Descrição</th>
+            <th>Valor</th>
+            <th>Movimento</th>
+            <th>Comentário</th>
+            <th>Ações</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="t : ${transacoes}">
+            <td th:text="${t.description}"></td>
+            <td th:text="${t.value}"></td>
+            <td th:text="${t.movement}"></td>
+            <td th:text="${t.comment?.text ?: 'Sem comentário'}"></td>
+            <td>
+                <a th:href="@{'/transacoes/' + ${t.id} + '/editar'}" class="btn btn-sm btn-warning">Editar</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</html>

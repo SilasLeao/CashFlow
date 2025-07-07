@@ -1,0 +1,33 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="main :: content">
+<div >
+    <h2>Extrato</h2>
+    <form method="get" th:action="@{/extrato}">
+        <div class="row mb-3">
+            <div class="col"><input type="date" name="start" class="form-control"></div>
+            <div class="col"><input type="date" name="end" class="form-control"></div>
+            <div class="col"><button type="submit" class="btn btn-primary">Filtrar</button></div>
+        </div>
+    </form>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th>Valor</th>
+            <th>Comentário</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="t : ${extrato}">
+            <td th:text="${#dates.format(t.date, 'dd/MM/yyyy')}"></td>
+            <td th:text="${t.description}"></td>
+            <td th:text="${t.value}"></td>
+            <td>
+                <span th:if="${t.comment != null}" class="text-info fw-bold" th:text="${t.comment.text}"></span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</html>
