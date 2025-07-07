@@ -10,5 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, UUID> {
-    List<Category> findByNatureOrderByOrderAsc(Nature nature);
+    List<Category> findByNatureOrderByOrderIndexAsc(Nature nature);
 }
