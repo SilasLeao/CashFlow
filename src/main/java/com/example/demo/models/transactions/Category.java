@@ -1,35 +1,40 @@
-package com.example.demo.Models.Users;
+package com.example.demo.models.transactions;
 
-import com.example.demo.Models.Accounts.Account;
+
+import com.example.demo.models.enums.Nature;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.UUID;
 
+@Table(name = "Category")
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "Users")
-public class User {
+public class Category {
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     private String name;
 
-    private PasswordEncoder password;
+    @Enumerated(EnumType.STRING)
+    private Nature nature;
 
-    private String login;
+    private Boolean active;
 
-    private String type;
+    private Integer orderIndex;
 
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE,
+    
+    @OneToMany(mappedBy = "category", cascade = {CascadeType.REMOVE,
             CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
-    private List<Account> accounts;
+    private List<Transaction> transactions;
 
 }

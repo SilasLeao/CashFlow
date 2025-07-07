@@ -1,9 +1,9 @@
-package com.example.demo.Models.Accounts;
+package com.example.demo.models.accounts;
 
 
-import com.example.demo.Models.Transactions.Transaction;
-import com.example.demo.Models.Users.User;
-import com.example.demo.Models.enums.AccountType;
+import com.example.demo.models.transactions.Transaction;
+import com.example.demo.models.users.User;
+import com.example.demo.models.enums.AccountType;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,8 +1,6 @@
-package com.example.demo.Models.Transactions;
+package com.example.demo.models.users;
 
-
-import com.example.demo.Models.enums.Nature;
-
+import com.example.demo.models.accounts.Account;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,30 +9,26 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
-@Table(name = "Category")
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Category {
-
-
+@Entity
+@Table(name = "Users")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    private Nature nature;
+    private String password;
 
-    private Boolean active;
+    private String login;
 
-    private Integer order;
+    private String type;
 
-    
-    @OneToMany(mappedBy = "category", cascade = {CascadeType.REMOVE,
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE,
             CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
-    private List<Transaction> transactions;
+    private List<Account> accounts;
 
 }
