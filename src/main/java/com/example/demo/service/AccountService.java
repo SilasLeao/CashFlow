@@ -7,6 +7,7 @@ import com.example.demo.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,6 +20,10 @@ public class AccountService {
     public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
+    }
+
+    public List<Account> findAll() {
+        return accountRepository.findAll();
     }
 
     public Account save(Account account) {
