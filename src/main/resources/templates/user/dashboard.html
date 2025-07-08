@@ -1,34 +1,39 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="main :: content">
-<div class="row">
-    <div class="col-12">
-        <h2 class="mb-4">Bem-vindo, <span th:text="${user.name}">Usuário</span>!</h2>
-    </div>
+<html xmlns:th="http://www.thymeleaf.org" >
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<nav th:insert="layout/main :: header"></nav>
+<div th:fragment="content">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Bem-vindo, <span th:text="${user.name}">Usuário</span>!</h2>
+        </div>
 
-    <!-- Resumo de contas -->
-    <div class="col-md-6 mb-4" th:each="conta : ${contas}">
-        <div class="card border-primary">
-            <div class="card-header bg-primary text-white">
-                Conta <span th:text="${conta.number}">0000</span> - <span th:text="${conta.type}">CORRENTE</span>
-            </div>
-            <div class="card-body">
-                <h5 class="card-title" th:text="${conta.description}">Minha Conta</h5>
-                <p class="card-text">
-                    Saldo: <strong>R$ <span th:text="${conta.balance}">0.00</span></strong>
-                </p>
-                <a th:href="@{'/contas/' + ${conta.id} + '/transacoes'}" class="btn btn-outline-primary btn-sm">Ver Transações</a>
+        <!-- Resumo de contas -->
+        <div class="col-md-6 mb-4" th:each="conta : ${contas}">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    Conta <span th:text="${conta.number}">0000</span> - <span th:text="${conta.type}">CORRENTE</span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${conta.description}">Minha Conta</h5>
+                    <p class="card-text">
+                        Saldo: <strong>R$ <span th:text="${conta.balance}">0.00</span></strong>
+                    </p>
+                    <a th:href="@{'/contas/' + ${conta.id} + '/transacoes'}" class="btn btn-outline-primary btn-sm">Ver Transações</a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Atalhos -->
-    <div class="col-12 mt-4">
-        <h4>Atalhos Rápidos</h4>
-        <div class="d-flex flex-wrap gap-3">
-            <a href="/contas" class="btn btn-outline-dark">Minhas Contas</a>
-            <a href="/transacoes" class="btn btn-outline-dark">Transações</a>
-            <a href="/extrato" class="btn btn-outline-dark">Extrato Mensal</a>
-            <a href="/orcamento" class="btn btn-outline-dark">Orçamento Anual</a>
+        <!-- Atalhos -->
+        <div class="col-12 mt-4">
+            <h4>Atalhos Rápidos</h4>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="/contas" class="btn btn-outline-dark">Minhas Contas</a>
+                <a href="/transacoes" class="btn btn-outline-dark">Transações</a>
+                <a href="/extrato" class="btn btn-outline-dark">Extrato Mensal</a>
+                <a href="/orcamento" class="btn btn-outline-dark">Orçamento Anual</a>
+            </div>
         </div>
     </div>
 </div>
+
