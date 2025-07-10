@@ -1,39 +1,154 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" >
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+
 <nav th:insert="layout/main :: header"></nav>
-<div th:fragment="content">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4">Bem-vindo, <span th:text="${user.name}">Usuário</span>!</h2>
+
+<div th:fragment="content" class="container py-4">
+    <h2>Bem-vindo, <span th:text="${user != null} ? ${user.name} : 'Usuário'"></span>!</h2>
+
+    <!-- 🔒 Se for ADMIN -->
+    <div th:if="${user.type == 'ADMIN'}" class="mt-5">
+
+        <!-- 📂 Gerenciar Categorias -->
+        <h4>Categorias do Sistema</h4>
+
+        <form th:action="@{/dashboard/criarCategoria}" method="post" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <input type="text" name="name" class="form-control" placeholder="Nome da Categoria" required>
+            </div>
+            <div class="col-md-3">
+                <select name="nature" class="form-select" required>
+                    <option value="ENTRADA">Entrada</option>
+                    <option value="SAIDA">Saída</option>
+                    <option value="INVESTIMENTO">Investimento</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="number" name="orderIndex" class="form-control" placeholder="Ordem" required>
+            </div>
+            <div class="col-md-2">
+                <select name="active" class="form-select">
+                    <option value="true" selected>Ativa</option>
+                    <option value="false">Inativa</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-success w-100">Salvar</button>
+            </div>
+            <div th:if="${mensagemSucesso}" class="alert alert-success" role="alert" th:text="${mensagemSucesso}"></div>
+            <div th:if="${mensagemErro}" class="alert alert-danger" role="alert" th:text="${mensagemErro}"></div>
+        </form>
+
+        <!-- 🗃️ Listagem de categorias existentes -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm">
+                <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Natureza</th>
+                    <th>Ordem</th>
+                    <th>Ativa</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Linha de edição -->
+                <tr th:each="cat : ${categorias}" th:if="${cat.editing}">
+                    <form th:action="@{/dashboard/editarCategoria/{id}(id=${cat.id})}" method="post">
+                        <td><input type="text" name="name" th:value="${cat.name}" class="form-control" required/></td>
+                        <td>
+                            <select name="nature" class="form-select" required>
+                                <option value="ENTRADA" th:selected="${cat.nature == 'ENTRADA'}">Entrada</option>
+                                <option value="SAIDA" th:selected="${cat.nature == 'SAIDA'}">Saída</option>
+                                <option value="INVESTIMENTO" th:selected="${cat.nature == 'INVESTIMENTO'}">Investimento</option>
+                            </select>
+                        </td>
+                        <td><input type="number" name="orderIndex" th:value="${cat.orderIndex}" class="form-control" required/></td>
+                        <td>
+                            <select name="active" class="form-select" required>
+                                <option value="true" th:selected="${cat.active}">Sim</option>
+                                <option value="false" th:selected="${!cat.active}">Não</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="hidden" name="_method" value="put" />
+                            <button type="submit" class="btn btn-success btn-sm">Salvar</button>
+                            <a th:href="@{/dashboard}" class="btn btn-secondary btn-sm">Cancelar</a>
+                        </td>
+                    </form>
+                </tr>
+
+
+                <!-- Linha normal -->
+                <tr th:each="cat : ${categorias}" th:if="${!cat.editing}" th:id="${'cat-' + cat.id}">
+                    <td th:text="${cat.name}">Nome</td>
+                    <td th:text="${cat.nature}">Natureza</td>
+                    <td th:text="${cat.orderIndex}">Ordem</td>
+                    <td>
+                        <span class="badge bg-success" th:if="${cat.active}">Sim</span>
+                        <span class="badge bg-secondary" th:if="${!cat.active}">Não</span>
+                    </td>
+                    <td>
+                        <form th:action="@{/dashboard/editarCategoria/{id}(id=${cat.id})}" method="get" class="d-inline">
+                            <button type="submit" class="btn btn-primary btn-sm">Editar</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+
+            </table>
         </div>
 
-        <!-- Resumo de contas -->
-        <div class="col-md-6 mb-4" th:each="conta : ${contas}">
-            <div class="card border-primary">
-                <div class="card-header bg-primary text-white">
-                    Conta <span th:text="${conta.number}">0000</span> - <span th:text="${conta.type}">CORRENTE</span>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${conta.description}">Minha Conta</h5>
-                    <p class="card-text">
-                        Saldo: <strong>R$ <span th:text="${conta.balance}">0.00</span></strong>
-                    </p>
-                    <a th:href="@{'/contas/' + ${conta.id} + '/transacoes'}" class="btn btn-outline-primary btn-sm">Ver Transações</a>
-                </div>
-            </div>
+
+
+        <!-- 👥 Gerenciar Correntistas -->
+        <h4 class="mt-5">Correntistas</h4>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover">
+                <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Login</th>
+                    <th>Tipo</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${usuarios}">
+                    <td th:text="${u.name}">Fulano</td>
+                    <td th:text="${u.login}">fulano</td>
+                    <td th:text="${u.type}">NORMAL</td>
+                    <td>
+                        <span class="badge bg-success" th:if="${!u.blocked}">Ativo</span>
+                        <span class="badge bg-danger" th:if="${u.blocked}">Bloqueado</span>
+                    </td>
+                    <td>
+                        <div th:if="${u.type != 'ADMIN'}">
+                            <form th:action="@{'/usuarios/' + ${u.id} + '/bloquear'}" method="post" th:if="${!u.blocked}">
+                                <button class="btn btn-warning btn-sm">Bloquear</button>
+                            </form>
+                            <form th:action="@{'/usuarios/' + ${u.id} + '/desbloquear'}" method="post" th:if="${u.blocked}">
+                                <button class="btn btn-success btn-sm">Desbloquear</button>
+                            </form>
+                            <form th:action="@{'/usuarios/' + ${u.id} + '/excluir'}" method="post" class="d-inline">
+                                <button class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este usuário?')">Excluir</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
         </div>
 
-        <!-- Atalhos -->
-        <div class="col-12 mt-4">
-            <h4>Atalhos Rápidos</h4>
-            <div class="d-flex flex-wrap gap-3">
-                <a href="/contas" class="btn btn-outline-dark">Minhas Contas</a>
-                <a href="/transacoes" class="btn btn-outline-dark">Transações</a>
-                <a href="/extrato" class="btn btn-outline-dark">Extrato Mensal</a>
-                <a href="/orcamento" class="btn btn-outline-dark">Orçamento Anual</a>
-            </div>
-        </div>
     </div>
 </div>
-
+</body>
+</html>

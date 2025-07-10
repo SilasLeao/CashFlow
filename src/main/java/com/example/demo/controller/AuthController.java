@@ -34,18 +34,20 @@ public class AuthController {
         User validUser = authService.isValid(user);
 
         if (validUser != null) {
-
-            session.setAttribute("usuario", validUser);
-            mav.setViewName("redirect:/dashboard");
-
+            if (validUser.isBlocked()) {
+                attr.addFlashAttribute("mensagem", "Usuário bloqueado! Entre em contato com o administrador.");
+                mav.setViewName("redirect:/");
+            } else {
+                session.setAttribute("usuario", validUser);
+                mav.setViewName("redirect:/dashboard");
+            }
         } else {
-
             attr.addFlashAttribute("mensagem", "Login e/ou senha inválidos!");
             mav.setViewName("redirect:/");
-
         }
 
         return mav;
     }
+
 
 }
