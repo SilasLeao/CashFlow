@@ -32,7 +32,18 @@ public class Category {
 
     private Integer orderIndex;
 
-    
+    @Transient
+    private boolean editing = false;
+
+    public boolean isEditing() {
+        return editing;
+    }
+
+    public void setEditing(boolean editing) {
+        this.editing = editing;
+    }
+
+
     @OneToMany(mappedBy = "category", cascade = {CascadeType.REMOVE,
             CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<Transaction> transactions;

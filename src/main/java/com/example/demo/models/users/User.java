@@ -31,4 +31,15 @@ public class User {
             CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<Account> accounts;
 
+    @Column(nullable = false)
+    private boolean isBlocked = false;
+
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.isBlocked = blocked;
+    }
+
 }
