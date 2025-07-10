@@ -7,6 +7,7 @@ import com.example.demo.service.AccountService;
 import com.example.demo.service.ExtratoService;
 import com.example.demo.service.OrcamentoService;
 import com.example.demo.service.TransactionService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,16 +30,19 @@ public class HomeController {
     @Autowired
     private OrcamentoService orcamentoService;
 
-    @GetMapping("/")
-    public String home() {
-        return "layout/main";
-    }
-
     @GetMapping("/dashboard")
-    public String showDashboard(Model model, User user) {
+    public String showDashboard(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("usuario");
+
+        if (user == null) {
+            return "redirect:/";
+        }
+
         model.addAttribute("user", user);
+        // model.addAttribute("contas", user.getAccounts()); // Se quiser mostrar as contas
         return "user/dashboard";
     }
+
 
     @GetMapping("/contas")
     public String listAccounts(Model model) {
@@ -54,14 +58,14 @@ public class HomeController {
         return "user/transacoes";
     }
 
-    @GetMapping("/user/extrato")
+    @GetMapping("/extrato")
     public String showExtrato(Model model) {
         List<Transaction> extrato = extratoService.getExtratoDoMes();
         model.addAttribute("extrato", extrato);
         return "user/extrato";
     }
 
-    @GetMapping("/user/orcamento")
+    @GetMapping("/orcamento")
     public String showOrcamentoAnual(Model model) {
         var planilha = orcamentoService.getPlanilhaOrcamento();
         model.addAttribute("planilha", planilha);

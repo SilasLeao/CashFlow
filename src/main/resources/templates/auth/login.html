@@ -25,7 +25,7 @@
 
                 <div th:if="${mensagem}" class="alert alert-danger" th:text="${mensagem}"></div>
 
-                <form th:action="@{/auth}" method="post" th:object="${user}" class="form-signin">
+                <form th:action="@{/}" method="post" th:object="${user}" class="form-signin">
                     <div class="mb-3">
                         <label for="login" class="form-label">Usuário</label>
                         <input type="text" th:field="*{login}" class="form-control" id="login"

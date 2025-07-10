@@ -3,7 +3,7 @@
 <nav th:insert="layout/main :: header"></nav>
 <div th:fragment="content">
     <h2>Transações</h2>
-    <a th:href="@{'/contas/' + ${conta.id} + '/transacoes/nova'}" class="btn btn-success mb-3">Nova Transação</a>
+    <a th:href="@{/transacoes/criar}" class="btn btn-success mb-3">Nova Transação</a>
     <table class="table">
         <thead>
         <tr>
