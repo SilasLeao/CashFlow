@@ -1,29 +1,54 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
 <nav th:insert="layout/main :: header"></nav>
-<div th:fragment="content">
-    <h2>Minhas Contas</h2>
-    <a href="/contas/nova" class="btn btn-success mb-3">Nova Conta</a>
-    <table class="table table-bordered">
+
+<div th:fragment="content" class="container mt-4">
+    <h2>Nova Conta</h2>
+    <form th:action="@{/contas/nova}" method="post" th:object="${conta}">
+        <div class="mb-3">
+            <label for="number" class="form-label">Número</label>
+            <input type="text" th:field="*{number}" class="form-control" id="number" required />
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Descrição</label>
+            <input type="text" th:field="*{description}" class="form-control" id="description" />
+        </div>
+        <div class="mb-3">
+            <label for="type" class="form-label">Tipo</label>
+            <select th:field="*{type}" class="form-control" id="type">
+                <!-- <option th:each="tipo : ${tiposConta}" th:value="${tipo}" th:text="${tipo}"></option> -->
+                 <option value="CORRENTE">CORRENTE</option>
+                 <option value="CARTAO">CARTAO</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">Salvar</button>
+    </form>
+
+    <div class="container mt-4">
+    <h2>Contas</h2>
+
+    <table class="table table-striped">
         <thead>
-        <tr>
-            <th>Número</th>
-            <th>Descrição</th>
-            <th>Tipo</th>
-            <th>Ações</th>
-        </tr>
+            <tr>
+                <th>Número</th>
+                <th>Descrição</th>
+                <th>Tipo</th>
+                <th>Validade</th>
+                <th>Usuário</th>
+            </tr>
         </thead>
         <tbody>
-        <tr th:each="conta : ${contas}">
-            <td th:text="${conta.number}"></td>
-            <td th:text="${conta.description}"></td>
-            <td th:text="${conta.type}"></td>
-            <td>
-                <a th:href="@{'/contas/' + ${conta.id} + '/transacoes'}" class="btn btn-sm btn-info">Ver Transações</a>
-            </td>
-        </tr>
+            <tr th:each="conta : ${contas}">
+                <td th:text="${conta.number}">Número</td>
+                <td th:text="${conta.description}">Descrição</td>
+                <td th:text="${conta.type}">Tipo</td>
+                <td th:text="${#temporals.format(conta.finishDay, 'dd/MM/yyyy')}">Validade</td>
+                <td th:text="${conta.user.name}">Usuário</td> <!-- só exibe se admin -->
+            </tr>
         </tbody>
     </table>
+</div>
 </div>
 </html>
