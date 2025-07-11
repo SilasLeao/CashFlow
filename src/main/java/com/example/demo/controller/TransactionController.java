@@ -38,7 +38,7 @@ public class TransactionController {
     @GetMapping("/criar")
     public String showCreateForm(Model model, @AuthenticationPrincipal User user) {
         List<Account> userAccounts = accountService.findByUser(user);
-        List<Category> categories = categoryService.findAll();
+        List<Category> categories = categoryService.findActiveCategories();
 
         model.addAttribute("transaction", new Transaction());
         model.addAttribute("movementTypes", MovementType.values());
@@ -59,7 +59,7 @@ public class TransactionController {
         Account selectedAccount = accountService.findByIdOrThrow(accountId);
         Category selectedCategory = categoryService.findByIdOrThrow(categoryId);
 
-        transaction.setAccounts(Collections.singletonList(selectedAccount));
+        transaction.setAccount(selectedAccount);
         transaction.setCategory(selectedCategory);
 
         transactionService.save(transaction);
@@ -76,7 +76,8 @@ public class TransactionController {
                 .orElseThrow(() -> new IllegalArgumentException("ID da Transação inválido:" + id));
 
         List<Account> userAccounts = accountService.findByUser(user);
-        List<Category> categories = categoryService.findAll();
+        List<Category> categories = categoryService.findActiveCategories();
+
 
         if (transaction.getComment() == null) {
             transaction.setComment(new Comment());
@@ -103,8 +104,8 @@ public class TransactionController {
         Account selectedAccount = accountService.findByIdOrThrow(accountId);
         Category selectedCategory = categoryService.findByIdOrThrow(categoryId);
 
-        transaction.setAccounts(Collections.singletonList(selectedAccount));
-        transaction.setCategory(selectedCategory);
+         transaction.setAccount(selectedAccount);
+         transaction.setCategory(selectedCategory);
 
         transactionService.save(transaction);
         return "redirect:/transacoes";

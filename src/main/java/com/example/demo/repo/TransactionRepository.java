@@ -13,7 +13,7 @@ import java.util.Date;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
     List<Transaction> findByCategoryId(UUID categoryId);
-    List<Transaction> findByAccounts_Id(UUID accountId);
-    List<Transaction> findByAccounts_IdAndDateBetween(UUID accountId, Date start, Date end);
-    List<Transaction> findByAccounts_User(User user);
+    List<Transaction> findByAccount_Id(UUID accountId);
+    List<Transaction> findByAccount_IdAndDateBetween(UUID accountId, Date start, Date end);
+    List<Transaction> findByAccount_User(User user);
 }

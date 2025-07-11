@@ -37,13 +37,10 @@ public class Transaction {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-    @ManyToMany
-    @JoinTable(
-        name = "transacao_conta",
-        joinColumns = @JoinColumn(name = "transacao_id"),
-        inverseJoinColumns = @JoinColumn(name = "conta_id")
-    )
-    private List<Account> accounts;
+    @ManyToOne
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
+
 
     @ManyToOne
     private Category category;

@@ -40,8 +40,9 @@ public class Account {
 
     private LocalDateTime finishDay;
 
-    @ManyToMany(mappedBy = "accounts")
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> transactions;
+
 
 
 

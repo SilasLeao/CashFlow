@@ -24,6 +24,6 @@ public class ExtratoService {
         calendar.add(Calendar.DATE, -1);
         Date fim = calendar.getTime();
 
-        return transactionRepository.findByAccounts_IdAndDateBetween(contaSimuladaId, inicio, fim);
+        return transactionRepository.findByAccount_IdAndDateBetween(contaSimuladaId, inicio, fim);
     }
 }
