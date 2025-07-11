@@ -29,4 +29,8 @@ public class CategoryService {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
     }
+
+    public List<Category> findActiveCategories() {
+        return categoryRepository.findByActiveTrueOrderByOrderIndexAsc();
+    }
 }

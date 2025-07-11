@@ -43,7 +43,7 @@
                     <option th:each="acc : ${userAccounts}"
                             th:value="${acc.id}"
                             th:text="${acc.description}"
-                            th:selected="${!#lists.isEmpty(transaction.accounts) and transaction.accounts[0].id == acc.id}">
+                            th:selected="${transaction.account != null and transaction.account.id == acc.id}">
                     </option>
                 </select>
             </div>

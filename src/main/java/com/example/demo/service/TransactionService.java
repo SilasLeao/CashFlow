@@ -27,7 +27,7 @@ public class TransactionService {
      */
     @Transactional(readOnly = true)
     public List<Transaction> findByUser(User user) {
-        return transactionRepository.findByAccounts_User(user);
+        return transactionRepository.findByAccount_User(user);
     }
 
 
@@ -41,7 +41,7 @@ public class TransactionService {
     @Transactional(readOnly = true)
     public List<Transaction> findByAccountId(UUID accountId) {
         // Este método 'findByAccounts_Id' já existia no seu repositório!
-        return transactionRepository.findByAccounts_Id(accountId);
+        return transactionRepository.findByAccount_Id(accountId);
     }
 
     @Transactional(readOnly = true)
