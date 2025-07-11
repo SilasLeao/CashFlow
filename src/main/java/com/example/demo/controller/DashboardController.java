@@ -7,10 +7,7 @@ import com.example.demo.models.transactions.Transaction;
 import com.example.demo.models.users.User; // Seu modelo de usuário
 import com.example.demo.repo.CategoryRepository;
 import com.example.demo.repo.UserRepository;
-import com.example.demo.service.AccountService;
-import com.example.demo.service.ExtratoService;
-import com.example.demo.service.OrcamentoService;
-import com.example.demo.service.TransactionService;
+import com.example.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal; // Importante para injetar o usuário
 import org.springframework.stereotype.Controller;
@@ -41,6 +38,9 @@ public class DashboardController { // Verifique se o nome da classe é este
 
     @Autowired
     private OrcamentoService orcamentoService;
+
+    @Autowired
+    private UserService userService;
 
     // O método @ModelAttribute addUserToModel foi REMOVIDO,
     // pois o Spring Security gerencia o usuário e o injeta diretamente.
@@ -213,6 +213,44 @@ public class DashboardController { // Verifique se o nome da classe é este
 
         return "redirect:/dashboard";
     }
+
+    @PostMapping("/usuarios/cadastrar")
+    public String cadastrarUsuario(@RequestParam String name,
+                                   @RequestParam String login,
+                                   @RequestParam String password,
+                                   @RequestParam String type,
+                                   RedirectAttributes attr,
+                                   @AuthenticationPrincipal User admin) {
+        if (!"ADMIN".equals(admin.getType())) {
+            attr.addFlashAttribute("mensagemErro", "Você não tem permissão para cadastrar usuários.");
+            return "redirect:/dashboard";
+        }
+
+        if (!type.equals("NORMAL") && !type.equals("ADMIN")) {
+            attr.addFlashAttribute("mensagemErro", "Tipo de usuário inválido.");
+            return "redirect:/dashboard";
+        }
+
+        // Verifica se o login já existe usando o service
+        if (userService.loginExists(login)) {
+            attr.addFlashAttribute("mensagemErro", "Login já está em uso.");
+            return "redirect:/dashboard";
+        }
+
+        // Cria e salva usuário usando o service
+        User novoUsuario = new User();
+        novoUsuario.setName(name);
+        novoUsuario.setLogin(login);
+        novoUsuario.setPassword(password); // será codificado no service
+        novoUsuario.setType(type);
+        novoUsuario.setBlocked(false);
+
+        userService.saveUser(novoUsuario);
+
+        attr.addFlashAttribute("mensagemSucesso", "Usuário cadastrado com sucesso!");
+        return "redirect:/dashboard";
+    }
+
 
     @GetMapping("/contas")
     public String listAccounts(Model model, @AuthenticationPrincipal User user) { // Injetando o User
