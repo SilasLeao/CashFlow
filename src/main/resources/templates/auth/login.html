@@ -29,6 +29,9 @@
                 <div th:if="${param.logout}" class="alert alert-info" role="alert">
                     Você foi desconectado com sucesso.
                 </div>
+                <div th:if="${param.blocked}" class="alert alert-warning" role="alert">
+                    Esta conta de usuário está bloqueada. Entre em contato com o administrador.
+                </div>
 
                 <form th:action="@{/perform_login}" method="post" class="form-signin">
                     <div class="mb-3">

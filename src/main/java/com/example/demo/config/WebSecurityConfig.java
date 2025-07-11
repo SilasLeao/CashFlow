@@ -1,5 +1,9 @@
 package com.example.demo.config;
 
+// 1. Importe o seu novo handler e a anotação Autowired
+import com.example.demo.config.security.CustomAuthenticationFailureHandler;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,32 +16,37 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
+    
+    // 2. Injete o seu handler customizado
+    @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                // 1. URLs que SÃO PERMITIDAS a TODOS (mesmo sem login)
+                // Suas regras de permissão continuam as mesmas
                 .requestMatchers(
-                    AntPathRequestMatcher.antMatcher("/auth**"), // Sua página de login (/auth e /auth?error, /auth?logout)
-                    AntPathRequestMatcher.antMatcher("/css/**"), // Arquivos CSS
-                    AntPathRequestMatcher.antMatcher("/imagens/**"), // Imagens
-                    AntPathRequestMatcher.antMatcher("/error") // Página de erro padrão do Spring
+                    AntPathRequestMatcher.antMatcher("/auth**"),
+                    AntPathRequestMatcher.antMatcher("/css/**"),
+                    AntPathRequestMatcher.antMatcher("/imagens/**"),
+                    AntPathRequestMatcher.antMatcher("/error")
                 ).permitAll()
-                // 2. URLs que exigem um PAPEL ESPECÍFICO (ex: ADMIN)
                 .requestMatchers(
                     AntPathRequestMatcher.antMatcher("/correntistas/**")
                 ).hasRole("ADMIN")
-                // 3. TODAS AS OUTRAS URLs exigem AUTENTICAÇÃO
-                // Esta regra deve ser a última e mais abrangente para pegar todo o resto.
                 .anyRequest().authenticated()
             )
             // Configurações do formulário de login
             .formLogin(form -> form
                 .loginPage("/auth")
                 .loginProcessingUrl("/perform_login")
-                .defaultSuccessUrl("/dashboard", true) // Redireciona para /dashboard
-                .failureUrl("/auth?error")
+                .defaultSuccessUrl("/dashboard", true)
+                
+                // 👇 AQUI ESTÁ A ÚNICA MUDANÇA NECESSÁRIA 👇
+                // Trocamos a URL de falha fixa por nosso handler inteligente
+                .failureHandler(customAuthenticationFailureHandler)
+                
                 .permitAll()
             )
             // Configurações de logout
@@ -46,7 +55,7 @@ public class WebSecurityConfig {
                 .logoutSuccessUrl("/auth?logout")
                 .permitAll()
             )
-            // Desabilite o CSRF por enquanto (lembre-se de habilitar para produção)
+            // Desabilite o CSRF
             .csrf(csrf -> csrf.disable());
 
         return http.build();

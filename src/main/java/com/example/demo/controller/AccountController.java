@@ -5,8 +5,6 @@ import com.example.demo.models.enums.AccountType;
 import com.example.demo.models.users.User;
 import com.example.demo.service.AccountService;
 
-import jakarta.servlet.http.HttpSession;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
