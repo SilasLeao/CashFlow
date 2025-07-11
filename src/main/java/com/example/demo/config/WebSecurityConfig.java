@@ -26,8 +26,7 @@ public class WebSecurityConfig {
                 ).permitAll()
                 // 2. URLs que exigem um PAPEL ESPECÍFICO (ex: ADMIN)
                 .requestMatchers(
-                    AntPathRequestMatcher.antMatcher("/correntistas/**"),
-                    AntPathRequestMatcher.antMatcher("/contas/**")
+                    AntPathRequestMatcher.antMatcher("/correntistas/**")
                 ).hasRole("ADMIN")
                 // 3. TODAS AS OUTRAS URLs exigem AUTENTICAÇÃO
                 // Esta regra deve ser a última e mais abrangente para pegar todo o resto.

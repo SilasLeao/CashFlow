@@ -5,6 +5,7 @@ import com.example.demo.repo.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,6 +28,11 @@ public class UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
 
     public boolean loginExists(String login) {
         return userRepository.findByLogin(login).isPresent();

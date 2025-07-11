@@ -37,6 +37,9 @@ public class DashboardController { // Verifique se o nome da classe é este
     private ExtratoService extratoService;
 
     @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
     private OrcamentoService orcamentoService;
 
     @Autowired
@@ -49,7 +52,10 @@ public class DashboardController { // Verifique se o nome da classe é este
     public String showDashboard(Model model, @AuthenticationPrincipal User user) {
         // A verificação manual de usuário (if (user == null)) foi REMOVIDA.
         // O Spring Security já garante que apenas usuários autenticados cheguem aqui.
-
+        // Redireciona usuários do tipo NORMAL para /contas
+        if ("NORMAL".equals(user.getType())) {
+            return "redirect:/contas";
+        }
         // Opcional: Adiciona o objeto 'user' ao modelo para uso direto na view
         // (ex: para th:object="${user}" ou para exibir dados do usuário).
         // Se você usa apenas sec:authentication no Thymeleaf, essa linha é redundante mas inofensiva.
@@ -59,9 +65,9 @@ public class DashboardController { // Verifique se o nome da classe é este
         // A autorização para acessar esta URL é feita no WebSecurityConfig (ex: anyRequest().authenticated()).
         // Esta verificação interna é para lógica de negócio, como exibir dados diferentes.
         if ("ADMIN".equals(user.getType())) {
-            List<User> usuarios = userRepository.findAll();
+            List<User> usuarios = userService.findAll();
             model.addAttribute("usuarios", usuarios);
-            List<Category> categorias = categoryRepository.findAll();
+            List<Category> categorias = categoryService.findAll();
             model.addAttribute("categorias", categorias);
         }
 
