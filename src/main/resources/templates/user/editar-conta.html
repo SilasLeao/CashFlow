@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Conta</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<nav th:insert="layout/main :: header"></nav>
+
+<div class="container mt-4" th:fragment="content">
+    <h2>Editar Conta</h2>
+
+    <form th:action="@{'/contas/editar/' + ${conta.id}}" method="post" th:object="${conta}">
+        <div class="mb-3">
+            <label for="number" class="form-label">Número</label>
+            <input type="text" th:field="*{number}" class="form-control" id="number" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Descrição</label>
+            <input type="text" th:field="*{description}" class="form-control" id="description" />
+        </div>
+
+        <div class="mb-3">
+            <label for="type" class="form-label">Tipo</label>
+            <select th:field="*{type}" class="form-select" id="type">
+                <option th:each="tipo : ${tiposConta}" th:value="${tipo}" th:text="${tipo}"></option>
+            </select>
+        </div>
+
+        <!-- Campo visível só para ADMIN -->
+        <div th:if="${#authorization.expression('hasAuthority(''ADMIN'')')}" class="mb-3">
+            <label for="usuario" class="form-label">Usuário</label>
+            <select name="userId" id="usuario" class="form-select">
+                <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.name}" th:selected="${u.id == conta.user.id}"></option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        <a th:href="@{/contas}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+</body>
+</html>

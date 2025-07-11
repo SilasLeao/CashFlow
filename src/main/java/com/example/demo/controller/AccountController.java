@@ -7,7 +7,9 @@ import com.example.demo.service.AccountService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
+import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +23,9 @@ import org.springframework.web.servlet.ModelAndView;
 public class AccountController {
 
     private final AccountService accountService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     public AccountController(AccountService accountService) {
@@ -38,18 +43,17 @@ public class AccountController {
     public ModelAndView listAccounts(@AuthenticationPrincipal User user, ModelAndView mav) {
         mav = new ModelAndView("user/contas");
 
-        List<Account> contas;
-
-        if ("ADMIN".equals(user.getType())) {
-            contas = accountService.findAll();
-        }
-        else {
-            // Se for usuário normal, pega só as contas dele
-            contas = accountService.findByUser(user);
-        }
+        List<Account> contas = "ADMIN".equals(user.getType())
+                ? accountService.findAll()
+                : accountService.findByUser(user);
 
         mav.addObject("contas", contas);
         mav.addObject("conta", new Account());
+        mav.addObject("user", user);
+
+        if ("ADMIN".equals(user.getType())) {
+            mav.addObject("usuarios", userService.findAll());
+        }
 
         return mav;
     }
@@ -65,10 +69,54 @@ public class AccountController {
 
     // Salvar nova conta
     @PostMapping("/nova")
-    public String salvarConta(@ModelAttribute Account account, @AuthenticationPrincipal User user) {
-        account.setUser(user);
+    public String salvarConta(@ModelAttribute Account account, @RequestParam(required = false) UUID userId, @AuthenticationPrincipal User currentUser) {
+
+        if ("ADMIN".equals(currentUser.getType()) && userId != null) {
+            User selectedUser = userService.findByIdOrThrow(userId);
+            account.setUser(selectedUser);
+        } else {
+            account.setUser(currentUser);
+        }
+
         account.setFinishDay(LocalDateTime.now().plusYears(1));
         accountService.save(account);
         return "redirect:/contas";
     }
+
+    @GetMapping("/editar/{id}")
+    public ModelAndView editarConta(@PathVariable UUID id, @AuthenticationPrincipal User user) {
+        if (!"ADMIN".equals(user.getType())) {
+            return new ModelAndView("redirect:/contas");
+        }
+
+        Account conta = accountService.findByIdOrThrow(id);
+        ModelAndView mav = new ModelAndView("user/editar-conta");
+        mav.addObject("conta", conta);
+        mav.addObject("usuarios", userService.findAll());
+        mav.addObject("tiposConta", AccountType.values());
+        return mav;
+    }
+
+    @PostMapping("/editar/{id}")
+    public String atualizarConta(@PathVariable UUID id,
+                                 @ModelAttribute Account contaAtualizada,
+                                 @RequestParam(required = false) UUID userId,
+                                 @AuthenticationPrincipal User currentUser) {
+
+        Account conta = accountService.findByIdOrThrow(id);
+
+        conta.setNumber(contaAtualizada.getNumber());
+        conta.setDescription(contaAtualizada.getDescription());
+        conta.setType(contaAtualizada.getType());
+
+        if ("ADMIN".equals(currentUser.getType()) && userId != null) {
+            User user = userService.findByIdOrThrow(userId);
+            conta.setUser(user);
+        }
+
+        accountService.save(conta);
+        return "redirect:/contas";
+    }
+
+
 }
