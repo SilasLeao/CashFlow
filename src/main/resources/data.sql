@@ -5,6 +5,15 @@ VALUES
     ('ba45d038-47aa-4877-996b-3d9603a53f51', 'Frederico', 'fred', '$2a$10$BZm4sInLcc.vNHHf8x2gG.gUUohxpKjcNTKsj7mklrVqC6VLQOKNq', 'NORMAL', false)
     ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO conta (id, user_id, number, description, type, finish_day)
+VALUES (
+    'b1d5a7b3-8c9f-4b67-9d2a-123456789abc', -- ID da conta (UUID gerado manualmente, se necessário)
+    'f00dc5df-b266-42ba-acc6-08d7256f9385', -- ID do usuário admin
+    '1234567890', -- número da conta
+    'Conta de Débito do Admin', -- descrição
+    'CORRENTE', -- tipo da conta (deve bater com o enum AccountType)
+    '2025-12-31' -- data de término (finish_day)
+) ON CONFLICT (id) DO NOTHING;
 
 -- Inserção das categorias predefinidas
 

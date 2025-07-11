@@ -26,6 +26,11 @@ public class AccountService {
         return accountRepository.findAll();
     }
 
+        public List<Account> findByUser(User user) {
+        return accountRepository.findByUser(user);
+    }
+
+
     public Account save(Account account) {
         if (account.getUser() != null) {
             Optional<User> userOptional = userRepository.findById(account.getUser().getId());

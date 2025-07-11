@@ -258,13 +258,13 @@ public class DashboardController { // Verifique se o nome da classe é este
     }
 
 
-    @GetMapping("/contas")
-    public String listAccounts(Model model, @AuthenticationPrincipal User user) { // Injetando o User
-        model.addAttribute("user", user); // Opcional
-        List<Account> accounts = accountService.findAll();
-        model.addAttribute("accounts", accounts);
-        return "user/contas"; // Confirme o caminho da sua view
-    }
+    // @GetMapping("/contas")
+    // public String listAccounts(Model model, @AuthenticationPrincipal User user) { // Injetando o User
+    //     model.addAttribute("user", user); // Opcional
+    //     List<Account> accounts = accountService.findAll();
+    //     model.addAttribute("accounts", accounts);
+    //     return "user/contas"; // Confirme o caminho da sua view
+    // }
 
     @GetMapping("/transacoes")
     public String listTransactions(Model model, @AuthenticationPrincipal User user) { // Injetando o User
