@@ -105,6 +105,30 @@
             </table>
         </div>
 
+        <h5 class="mt-5">Cadastrar Novo Correntista</h5>
+        <form th:action="@{/usuarios/cadastrar}" method="post" class="row g-3">
+            <div class="col-md-3">
+                <input type="text" name="name" class="form-control" placeholder="Nome" required>
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="login" class="form-control" placeholder="Login" required>
+            </div>
+            <div class="col-md-2">
+                <input type="password" name="password" class="form-control" placeholder="Senha" required>
+            </div>
+            <div class="col-md-2">
+                <select name="type" class="form-select" required>
+                    <option value="NORMAL">NORMAL</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
+            </div>
+        </form>
+
+        <div th:if="${mensagemSucesso}" class="alert alert-success mt-2" th:text="${mensagemSucesso}"></div>
+        <div th:if="${mensagemErro}" class="alert alert-danger mt-2" th:text="${mensagemErro}"></div>
 
 
         <!-- 👥 Gerenciar Correntistas -->
@@ -147,6 +171,8 @@
                 </tbody>
             </table>
         </div>
+
+
 
     </div>
 </div>

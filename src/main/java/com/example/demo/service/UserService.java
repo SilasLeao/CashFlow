@@ -27,4 +27,9 @@ public class UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
+
+    public boolean loginExists(String login) {
+        return userRepository.findByLogin(login).isPresent();
+    }
+
 }
