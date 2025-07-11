@@ -45,9 +45,6 @@ public class DashboardController { // Verifique se o nome da classe é este
     @Autowired
     private UserService userService;
 
-    // O método @ModelAttribute addUserToModel foi REMOVIDO,
-    // pois o Spring Security gerencia o usuário e o injeta diretamente.
-
     @GetMapping("/dashboard")
     public String showDashboard(Model model, @AuthenticationPrincipal User user) {
         // A verificação manual de usuário (if (user == null)) foi REMOVIDA.

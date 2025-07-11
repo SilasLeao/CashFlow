@@ -23,6 +23,13 @@
                  <option value="CARTAO">CARTAO</option>
             </select>
         </div>
+        <div th:if="${user.type == 'ADMIN'}" class="mb-3">
+            <label for="usuario" class="form-label">Usuário</label>
+            <select name="userId" id="usuario" class="form-select" required>
+                <option value="" disabled selected>Selecione o usuário</option>
+                <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.name}"></option>
+            </select>
+        </div>
         <button type="submit" class="btn btn-success">Salvar</button>
     </form>
 
@@ -37,6 +44,7 @@
                 <th>Tipo</th>
                 <th>Validade</th>
                 <th>Usuário</th>
+                <th th:if="${user.type == 'ADMIN'}">Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -45,7 +53,10 @@
                 <td th:text="${conta.description}">Descrição</td>
                 <td th:text="${conta.type}">Tipo</td>
                 <td th:text="${#temporals.format(conta.finishDay, 'dd/MM/yyyy')}">Validade</td>
-                <td th:text="${conta.user.name}">Usuário</td> <!-- só exibe se admin -->
+                <td th:text="${conta.user.name}">Usuário</td>
+                <td th:if="${user.type == 'ADMIN'}">
+                    <a th:href="@{'/contas/editar/' + ${conta.id}}" class="btn btn-primary btn-sm">Editar</a>
+                </td>
             </tr>
         </tbody>
     </table>
