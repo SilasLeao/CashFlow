@@ -23,18 +23,23 @@
             <div class="card-body">
                 <h3 class="card-title text-center mb-4">Login</h3>
 
-                <div th:if="${mensagem}" class="alert alert-danger" th:text="${mensagem}"></div>
+                <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                    Login e/ou senha inválidos!
+                </div>
+                <div th:if="${param.logout}" class="alert alert-info" role="alert">
+                    Você foi desconectado com sucesso.
+                </div>
 
-                <form th:action="@{/}" method="post" th:object="${user}" class="form-signin">
+                <form th:action="@{/perform_login}" method="post" class="form-signin">
                     <div class="mb-3">
-                        <label for="login" class="form-label">Usuário</label>
-                        <input type="text" th:field="*{login}" class="form-control" id="login"
-                            placeholder="Digite seu usuário" required autofocus>
+                        <label for="username" class="form-label">Usuário</label>
+                        <input type="text" class="form-control" id="username" name="username"
+                               placeholder="Digite seu usuário" required autofocus>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Senha</label>
-                        <input type="password" th:field="*{password}" class="form-control" id="password"
-                            placeholder="Digite sua senha" required>
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="Digite sua senha" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Entrar</button>
                 </form>
