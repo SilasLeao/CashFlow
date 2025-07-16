@@ -62,7 +62,7 @@
             
             <div class="mb-3">
                 <label for="date" class="form-label">Data da Transação</label>
-                <input type="date" class="form-control" id="date" th:field="*{date}" required>
+                <input type="date" class="form-control" id="date" th:field="*{date}" th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
             </div>
 
             <div class="mb-3">

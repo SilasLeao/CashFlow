@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID; // 👈 Importe a classe UUID
+import java.util.UUID;
 
 @Service
 public class AccountService {
@@ -21,6 +21,10 @@ public class AccountService {
     public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
+    }
+
+    public boolean existsByNumber(String number) {
+        return accountRepository.existsByNumber(number);
     }
 
     public List<Account> findAll() {
@@ -39,13 +43,6 @@ public class AccountService {
         return accountRepository.save(account);
     }
 
-    /**
-     * 👇 MÉTODO NOVO ADICIONADO AQUI 👇
-     * Busca uma conta pelo ID ou lança uma exceção se não for encontrada.
-     * @param id O UUID da conta.
-     * @return A entidade Account encontrada.
-     * @throws RuntimeException se a conta não for encontrada.
-     */
     public Account findByIdOrThrow(UUID id) {
         return accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Conta não encontrada com o ID: " + id));
