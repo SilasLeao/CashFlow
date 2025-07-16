@@ -16,10 +16,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/contas")
-@CrossOrigin(origins = "*") // ajuste conforme necessário
+@CrossOrigin(origins = "*")
 public class AccountController {
 
     private final AccountService accountService;
@@ -69,13 +70,18 @@ public class AccountController {
 
     // Salvar nova conta
     @PostMapping("/nova")
-    public String salvarConta(@ModelAttribute Account account, @RequestParam(required = false) UUID userId, @AuthenticationPrincipal User currentUser) {
+    public String salvarConta(@ModelAttribute Account account, @RequestParam(required = false) UUID userId, @AuthenticationPrincipal User currentUser, RedirectAttributes attr) {
 
         if ("ADMIN".equals(currentUser.getType()) && userId != null) {
             User selectedUser = userService.findByIdOrThrow(userId);
             account.setUser(selectedUser);
         } else {
             account.setUser(currentUser);
+        }
+
+        if (accountService.existsByNumber(account.getNumber())) {
+            attr.addFlashAttribute("errorMessage", "Já existe uma conta com esse número.");
+            return "redirect:/contas";
         }
 
         account.setFinishDay(LocalDateTime.now().plusYears(1));

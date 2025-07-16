@@ -161,11 +161,10 @@ public class TransactionController {
             }
         }
 
-        // 3. Adiciona todos os dados necessários ao modelo para a view
+
         model.addAttribute("user", user);
         model.addAttribute("transacoes", transacoes);
         model.addAttribute("filterableAccounts", filterableAccounts);
-        // 👇 3. Use a nova variável para enviar para a view.
         model.addAttribute("selectedAccountId", finalSelectedAccountId);
 
         return "user/transacoes";

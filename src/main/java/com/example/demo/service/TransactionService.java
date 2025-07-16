@@ -17,14 +17,6 @@ public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-     /**
-     * 👇 MÉTODO NOVO ADICIONADO AQUI 👇
-     * Busca todas as transações pertencentes a um usuário específico.
-     * @param user O usuário cujas transações serão buscadas.
-     * @return Uma lista de transações do usuário.
-     * 
-     * 
-     */
     @Transactional(readOnly = true)
     public List<Transaction> findByUser(User user) {
         return transactionRepository.findByAccount_User(user);
@@ -32,12 +24,6 @@ public class TransactionService {
 
 
 
-    /**
-     * 👇 MÉTODO NOVO ADICIONADO AQUI 👇
-     * Busca todas as transações associadas a um ID de conta específico.
-     * @param accountId O UUID da conta.
-     * @return Uma lista de transações da conta.
-     */
     @Transactional(readOnly = true)
     public List<Transaction> findByAccountId(UUID accountId) {
         // Este método 'findByAccounts_Id' já existia no seu repositório!

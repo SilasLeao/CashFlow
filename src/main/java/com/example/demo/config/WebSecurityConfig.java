@@ -17,7 +17,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class WebSecurityConfig {
     
-    // 2. Injete o seu handler customizado
+
     @Autowired
     private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
@@ -25,7 +25,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                // Suas regras de permissão continuam as mesmas
+                
                 .requestMatchers(
                     AntPathRequestMatcher.antMatcher("/auth**"),
                     AntPathRequestMatcher.antMatcher("/css/**"),
@@ -42,11 +42,7 @@ public class WebSecurityConfig {
                 .loginPage("/auth")
                 .loginProcessingUrl("/perform_login")
                 .defaultSuccessUrl("/dashboard", true)
-                
-                // 👇 AQUI ESTÁ A ÚNICA MUDANÇA NECESSÁRIA 👇
-                // Trocamos a URL de falha fixa por nosso handler inteligente
                 .failureHandler(customAuthenticationFailureHandler)
-                
                 .permitAll()
             )
             // Configurações de logout
@@ -55,7 +51,7 @@ public class WebSecurityConfig {
                 .logoutSuccessUrl("/auth?logout")
                 .permitAll()
             )
-            // Desabilite o CSRF
+            // Desabilitando o CSRF
             .csrf(csrf -> csrf.disable());
 
         return http.build();

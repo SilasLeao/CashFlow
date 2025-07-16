@@ -21,6 +21,10 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
 
+    public boolean existsByName(String name) {
+        return categoryRepository.existsByNameIgnoreCase(name);
+    }
+
     public Category save(Category category) {
         return categoryRepository.save(category);
     }

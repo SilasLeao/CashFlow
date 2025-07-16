@@ -12,11 +12,15 @@
 <div th:fragment="content" class="container py-4">
     <h2>Bem-vindo, <span th:text="${user != null} ? ${user.name} : 'Usuário'"></span>!</h2>
 
-    <!-- 🔒 Se for ADMIN -->
+    <!-- Se for ADMIN -->
     <div th:if="${user.type == 'ADMIN'}" class="mt-5">
 
-        <!-- 📂 Gerenciar Categorias -->
+        <!-- Gerenciar Categorias -->
         <h4>Categorias do Sistema</h4>
+
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <p th:text="${error}"></p>
+        </div>
 
         <form th:action="@{/dashboard/criarCategoria}" method="post" class="row g-3 mb-4">
             <div class="col-md-4">
@@ -45,7 +49,7 @@
             <div th:if="${mensagemErro}" class="alert alert-danger" role="alert" th:text="${mensagemErro}"></div>
         </form>
 
-        <!-- 🗃️ Listagem de categorias existentes -->
+        <!-- Listagem de categorias existentes -->
         <div class="table-responsive">
             <table class="table table-bordered table-sm">
                 <thead>
@@ -131,7 +135,7 @@
         <div th:if="${mensagemErro}" class="alert alert-danger mt-2" th:text="${mensagemErro}"></div>
 
 
-        <!-- 👥 Gerenciar Correntistas -->
+        <!-- Gerenciar Correntistas -->
         <h4 class="mt-5">Correntistas</h4>
         <div class="table-responsive">
             <table class="table table-sm table-hover">

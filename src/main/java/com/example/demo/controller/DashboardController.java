@@ -98,13 +98,17 @@ public class DashboardController { // Verifique se o nome da classe é este
             return "redirect:/dashboard";
         }
 
-        Category novaCategoria = new Category();
-        novaCategoria.setName(name);
-        novaCategoria.setNature(naturezaEnum);
-        novaCategoria.setOrderIndex(orderIndex);
-        novaCategoria.setActive(active);
+        Category newCategory = new Category();
+        newCategory.setName(name);
+        if (categoryService.existsByName(newCategory.getName())) {
+            attr.addFlashAttribute("error", "Já existe uma categoria com esse nome.");
+            return "redirect:/dashboard";
+        }
+        newCategory.setNature(naturezaEnum);
+        newCategory.setOrderIndex(orderIndex);
+        newCategory.setActive(active);
 
-        categoryRepository.save(novaCategoria);
+        categoryRepository.save(newCategory);
 
         attr.addFlashAttribute("mensagemSucesso", "Categoria criada com sucesso!");
         return "redirect:/dashboard";
