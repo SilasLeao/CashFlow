@@ -4,12 +4,12 @@ import com.example.demo.models.accounts.Account;
 import com.example.demo.models.enums.Nature;
 import com.example.demo.models.transactions.Category;
 import com.example.demo.models.transactions.Transaction;
-import com.example.demo.models.users.User; // Seu modelo de usuário
+import com.example.demo.models.users.User;
 import com.example.demo.repo.CategoryRepository;
 import com.example.demo.repo.UserRepository;
 import com.example.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal; // Importante para injetar o usuário
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Controller
-public class DashboardController { // Verifique se o nome da classe é este
+public class DashboardController { 
 
     @Autowired
     private AccountService accountService;
@@ -47,15 +47,11 @@ public class DashboardController { // Verifique se o nome da classe é este
 
     @GetMapping("/dashboard")
     public String showDashboard(Model model, @AuthenticationPrincipal User user) {
-        // A verificação manual de usuário (if (user == null)) foi REMOVIDA.
-        // O Spring Security já garante que apenas usuários autenticados cheguem aqui.
-        // Redireciona usuários do tipo NORMAL para /contas
+        // O Spring Security já garante que apenas usuários autenticados cheguem aqui
         if ("NORMAL".equals(user.getType())) {
             return "redirect:/contas";
         }
-        // Opcional: Adiciona o objeto 'user' ao modelo para uso direto na view
-        // (ex: para th:object="${user}" ou para exibir dados do usuário).
-        // Se você usa apenas sec:authentication no Thymeleaf, essa linha é redundante mas inofensiva.
+
         model.addAttribute("user", user);
 
         // Se o usuário for ADMIN, busca usuários e categorias adicionais.
@@ -68,8 +64,6 @@ public class DashboardController { // Verifique se o nome da classe é este
             model.addAttribute("categorias", categorias);
         }
 
-        // Retorna o nome da view do dashboard.
-        // Verifique se o arquivo HTML está em src/main/resources/templates/dashboard/dashboard.html
         return "user/dashboard";
     }
 
@@ -82,9 +76,8 @@ public class DashboardController { // Verifique se o nome da classe é este
             RedirectAttributes attr,
             @AuthenticationPrincipal User user // Usuário logado injetado aqui
     ) {
-        // Verificação de permissão interna: Apenas ADMIN pode criar categorias.
-        // Se esta URL já for restrita a ADMIN via WebSecurityConfig.hasRole("ADMIN"),
-        // esta verificação é redundante para controlar acesso, mas útil para mensagens de erro personalizadas.
+        // Verificação de permissão interna: Apenas ADMIN pode criar categorias
+        // para mensagens de erro personalizadas.
         if (!"ADMIN".equals(user.getType())) {
             attr.addFlashAttribute("mensagemErro", "Você não tem permissão para criar categorias.");
             return "redirect:/dashboard";
@@ -116,19 +109,16 @@ public class DashboardController { // Verifique se o nome da classe é este
 
     @GetMapping("/dashboard/editarCategoria/{id}")
     public String editarCategoriaForm(@PathVariable UUID id, Model model, @AuthenticationPrincipal User user) {
-        // A verificação manual de usuário foi REMOVIDA.
-
-        // Opcional: Adiciona o usuário ao modelo
         model.addAttribute("user", user);
 
-        System.out.println("teste get"); // Mantenha para debug se quiser
+        System.out.println("teste get"); 
         Category categoria = categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
         List<Category> categorias = categoryRepository.findAll();
 
         categorias.forEach(cat -> cat.setEditing(cat.getId().equals(id)));
 
         model.addAttribute("categorias", categorias);
-        return "user/dashboard"; // Confirme o caminho da view
+        return "user/dashboard"; 
     }
 
     @PostMapping("/dashboard/editarCategoria/{id}")
@@ -276,19 +266,19 @@ public class DashboardController { // Verifique se o nome da classe é este
     // }
 
     @GetMapping("/extrato")
-    public String showExtrato(Model model, @AuthenticationPrincipal User user) { // Injetando o User
-        model.addAttribute("user", user); // Opcional
+    public String showExtrato(Model model, @AuthenticationPrincipal User user) { 
+        model.addAttribute("user", user); 
         List<Transaction> extrato = extratoService.getExtratoDoMes();
         model.addAttribute("extrato", extrato);
-        return "user/extrato"; // Confirme o caminho da sua view
+        return "user/extrato"; 
     }
 
     @GetMapping("/orcamento")
-    public String showOrcamentoAnual(Model model, @AuthenticationPrincipal User user) { // Injetando o User
-        model.addAttribute("user", user); // Opcional
+    public String showOrcamentoAnual(Model model, @AuthenticationPrincipal User user) { 
+        model.addAttribute("user", user);
         var planilha = orcamentoService.getPlanilhaOrcamento();
         model.addAttribute("planilha", planilha);
-        return "user/orcamento"; // Confirme o caminho da sua view
+        return "user/orcamento";
     }
 
     @GetMapping("/")

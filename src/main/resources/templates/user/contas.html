@@ -11,6 +11,8 @@
         <p th:text="${errorMessage}"></p>
     </div>
     
+    <div th:if="${mensagemSucesso}" class="alert alert-success" role="alert" th:text="${mensagemSucesso}"></div>
+    
     <form th:action="@{/contas/nova}" method="post" th:object="${conta}">
         <div class="mb-3">
             <label for="number" class="form-label">Número</label>
@@ -18,7 +20,7 @@
         </div>
         <div class="mb-3">
             <label for="description" class="form-label">Descrição</label>
-            <input type="text" th:field="*{description}" class="form-control" id="description" />
+            <input type="text" th:field="*{description}" class="form-control" id="description" required />
         </div>
         <div class="mb-3">
             <label for="type" class="form-label">Tipo</label>
