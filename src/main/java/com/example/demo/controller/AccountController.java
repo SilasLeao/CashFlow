@@ -86,6 +86,7 @@ public class AccountController {
 
         account.setFinishDay(LocalDateTime.now().plusYears(1));
         accountService.save(account);
+        attr.addFlashAttribute("mensagemSucesso", "Conta criada com sucesso!");
         return "redirect:/contas";
     }
 

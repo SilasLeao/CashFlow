@@ -21,14 +21,14 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
 
         // Verifica se a exceção é do tipo 'LockedException' (usuário bloqueado)
         if (exception instanceof LockedException) {
-            redirectURL = "/auth?blocked=true"; // URL específica para usuário bloqueado
+            redirectURL = "/auth?blocked=true";
         }
 
-        // --- AQUI ESTÁ A MUDANÇA ---
-        // 1. Definimos a URL de falha que queremos usar.
+       
+        // Definição da URL de falha
         setDefaultFailureUrl(redirectURL);
         
-        // 2. Chamamos o método da classe pai (super) para que ele faça o redirecionamento
+        // Chamada do método da classe pai (super) para que ele faça o redirecionamento
         // e qualquer outra tarefa interna do Spring (como salvar a exceção na sessão).
         super.onAuthenticationFailure(request, response, exception);
     }
