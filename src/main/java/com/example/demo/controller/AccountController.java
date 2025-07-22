@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -23,27 +22,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @CrossOrigin(origins = "*")
 public class AccountController {
 
-    private final AccountService accountService;
+    @Autowired
+    private AccountService accountService;
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    public AccountController(AccountService accountService) {
-        this.accountService = accountService;
-    }
-
-    @PostMapping
-    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
-        Account savedAccount = accountService.save(account);
-        return ResponseEntity.ok(savedAccount);
-    }
-
-    // Listagem
+    // Exibe a tela de listagem de contas
     @GetMapping
     public ModelAndView listAccounts(@AuthenticationPrincipal User user, ModelAndView mav) {
         mav = new ModelAndView("user/contas");
 
+        // ADMIN vê todas as contas, usuário normal só as suas
         List<Account> contas = "ADMIN".equals(user.getType())
                 ? accountService.findAll()
                 : accountService.findByUser(user);
@@ -72,13 +62,16 @@ public class AccountController {
     @PostMapping("/nova")
     public String salvarConta(@ModelAttribute Account account, @RequestParam(required = false) UUID userId, @AuthenticationPrincipal User currentUser, RedirectAttributes attr) {
 
+        // ADMIN pode escolher outro usuário para vincular a conta
         if ("ADMIN".equals(currentUser.getType()) && userId != null) {
             User selectedUser = userService.findByIdOrThrow(userId);
             account.setUser(selectedUser);
+        // Usuário comum cria conta para si mesmo
         } else {
             account.setUser(currentUser);
         }
 
+        // Validação que impede a criação de conta com número já existente
         if (accountService.existsByNumber(account.getNumber())) {
             attr.addFlashAttribute("errorMessage", "Já existe uma conta com esse número.");
             return "redirect:/contas";
@@ -90,20 +83,23 @@ public class AccountController {
         return "redirect:/contas";
     }
 
+    // Exibe o formulário de edição de conta
     @GetMapping("/editar/{id}")
     public ModelAndView editarConta(@PathVariable UUID id, @AuthenticationPrincipal User user) {
         if (!"ADMIN".equals(user.getType())) {
+            // bloqueia acesso se não for ADMIN
             return new ModelAndView("redirect:/contas");
         }
 
         Account conta = accountService.findByIdOrThrow(id);
         ModelAndView mav = new ModelAndView("user/editar-conta");
         mav.addObject("conta", conta);
-        mav.addObject("usuarios", userService.findAll());
+        //mav.addObject("usuarios", userService.findAll());
         mav.addObject("tiposConta", AccountType.values());
         return mav;
     }
 
+    // Atualiza uma conta após o envio do formulário
     @PostMapping("/editar/{id}")
     public String atualizarConta(@PathVariable UUID id,
                                  @ModelAttribute Account contaAtualizada,
@@ -116,10 +112,10 @@ public class AccountController {
         conta.setDescription(contaAtualizada.getDescription());
         conta.setType(contaAtualizada.getType());
 
-        if ("ADMIN".equals(currentUser.getType()) && userId != null) {
-            User user = userService.findByIdOrThrow(userId);
-            conta.setUser(user);
-        }
+        // if ("ADMIN".equals(currentUser.getType()) && userId != null) {
+        //     User user = userService.findByIdOrThrow(userId);
+        //     conta.setUser(user);
+        // }
 
         accountService.save(conta);
         return "redirect:/contas";

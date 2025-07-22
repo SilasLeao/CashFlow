@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.models.users.User;
 import com.example.demo.repo.UserRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,13 +13,11 @@ import java.util.UUID;
 @Service
 public class UserService {
 
-    private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository) {
-        this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     public User saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -33,6 +33,9 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public void delete(User user) {
+        userRepository.delete(user);
+    }
 
     public boolean loginExists(String login) {
         return userRepository.findByLogin(login).isPresent();
