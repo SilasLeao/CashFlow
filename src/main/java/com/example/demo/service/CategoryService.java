@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.models.transactions.Category;
 import com.example.demo.repo.CategoryRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,11 +12,8 @@ import java.util.UUID;
 @Service
 public class CategoryService {
 
-    private final CategoryRepository categoryRepository;
-
-    public CategoryService(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     public List<Category> findAll() {
         return categoryRepository.findAll();

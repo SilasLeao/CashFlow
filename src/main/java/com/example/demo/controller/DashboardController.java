@@ -1,12 +1,10 @@
 package com.example.demo.controller;
 
-import com.example.demo.models.accounts.Account;
 import com.example.demo.models.enums.Nature;
 import com.example.demo.models.transactions.Category;
 import com.example.demo.models.transactions.Transaction;
 import com.example.demo.models.users.User;
 import com.example.demo.repo.CategoryRepository;
-import com.example.demo.repo.UserRepository;
 import com.example.demo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,16 +20,7 @@ import java.util.UUID;
 public class DashboardController { 
 
     @Autowired
-    private AccountService accountService;
-
-    @Autowired
     private CategoryRepository categoryRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private TransactionService transactionService;
 
     @Autowired
     private ExtratoService extratoService;
@@ -157,11 +146,11 @@ public class DashboardController {
             return "redirect:/dashboard";
         }
 
-        User user = userRepository.findById(id).orElse(null);
+        User user = userService.findByIdOrThrow(id);
 
         if (user != null && !"ADMIN".equals(user.getType())) {
             user.setBlocked(true);
-            userRepository.save(user);
+            userService.saveUser(user);
             attr.addFlashAttribute("mensagemSucesso", "Usuário bloqueado com sucesso!");
         } else if (user != null && "ADMIN".equals(user.getType())) {
              attr.addFlashAttribute("mensagemErro", "Não é possível bloquear outro administrador.");
@@ -178,10 +167,10 @@ public class DashboardController {
             return "redirect:/dashboard";
         }
 
-        User user = userRepository.findById(id).orElse(null);
+        User user = userService.findByIdOrThrow(id);
 
         if (user != null && !"ADMIN".equals(user.getType())) {
-            userRepository.delete(user);
+            userService.delete(user);
             attr.addFlashAttribute("mensagemSucesso", "Usuário excluído com sucesso!");
         } else if (user != null && "ADMIN".equals(user.getType())) {
              attr.addFlashAttribute("mensagemErro", "Não é possível excluir outro administrador.");
@@ -198,11 +187,11 @@ public class DashboardController {
             return "redirect:/dashboard";
         }
 
-        User user = userRepository.findById(id).orElse(null);
+        User user = userService.findByIdOrThrow(id);
 
         if (user != null && !"ADMIN".equals(user.getType())) {
             user.setBlocked(false);
-            userRepository.save(user);
+            userService.saveUser(user);
             attr.addFlashAttribute("mensagemSucesso", "Usuário desbloqueado com sucesso!");
         } else if (user != null && "ADMIN".equals(user.getType())) {
              attr.addFlashAttribute("mensagemErro", "Não é possível desbloquear outro administrador.");
@@ -248,22 +237,6 @@ public class DashboardController {
         return "redirect:/dashboard";
     }
 
-
-    // @GetMapping("/contas")
-    // public String listAccounts(Model model, @AuthenticationPrincipal User user) { // Injetando o User
-    //     model.addAttribute("user", user); // Opcional
-    //     List<Account> accounts = accountService.findAll();
-    //     model.addAttribute("accounts", accounts);
-    //     return "user/contas"; // Confirme o caminho da sua view
-    // }
-
-    // @GetMapping("/transacoes")
-    // public String listTransactions(Model model, @AuthenticationPrincipal User user) { // Injetando o User
-    //     model.addAttribute("user", user); // Opcional
-    //     List<Transaction> transactions = transactionService.findAll();
-    //     model.addAttribute("transactions", transactions);
-    //     return "user/transacoes"; // Confirme o caminho da sua view
-    // }
 
     @GetMapping("/extrato")
     public String showExtrato(Model model, @AuthenticationPrincipal User user) { 
