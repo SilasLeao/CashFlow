@@ -20,7 +20,13 @@ public class UserService {
     private UserRepository userRepository;
 
     public User saveUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        String password = user.getPassword();
+
+        // Verifica se a senha já está codificada
+        if (!password.startsWith("$2a$") && !password.startsWith("$2b$") && !password.startsWith("$2y$")) {
+            user.setPassword(passwordEncoder.encode(password));
+        }
+
         return userRepository.save(user);
     }
 

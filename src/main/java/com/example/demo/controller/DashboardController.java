@@ -16,11 +16,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.UUID;
 
+// Controlador responsável por lidar com as ações do dashboard (gerenciamento de usuários e categorias)
 @Controller
 public class DashboardController { 
-
-    @Autowired
-    private CategoryRepository categoryRepository;
 
     @Autowired
     private ExtratoService extratoService;
@@ -34,6 +32,7 @@ public class DashboardController {
     @Autowired
     private UserService userService;
 
+    // Exibe a tela de dashboard para usuários autenticados.
     @GetMapping("/dashboard")
     public String showDashboard(Model model, @AuthenticationPrincipal User user) {
         // O Spring Security já garante que apenas usuários autenticados cheguem aqui
@@ -44,8 +43,6 @@ public class DashboardController {
         model.addAttribute("user", user);
 
         // Se o usuário for ADMIN, busca usuários e categorias adicionais.
-        // A autorização para acessar esta URL é feita no WebSecurityConfig (ex: anyRequest().authenticated()).
-        // Esta verificação interna é para lógica de negócio, como exibir dados diferentes.
         if ("ADMIN".equals(user.getType())) {
             List<User> usuarios = userService.findAll();
             model.addAttribute("usuarios", usuarios);
@@ -56,6 +53,7 @@ public class DashboardController {
         return "user/dashboard";
     }
 
+    // Criação de categoria nova
     @PostMapping("/dashboard/criarCategoria")
     public String criarCategoria(
             @RequestParam String name,
@@ -63,10 +61,9 @@ public class DashboardController {
             @RequestParam Integer orderIndex,
             @RequestParam Boolean active,
             RedirectAttributes attr,
-            @AuthenticationPrincipal User user // Usuário logado injetado aqui
+            @AuthenticationPrincipal User user
     ) {
-        // Verificação de permissão interna: Apenas ADMIN pode criar categorias
-        // para mensagens de erro personalizadas.
+        // Verificação de permissão interna
         if (!"ADMIN".equals(user.getType())) {
             attr.addFlashAttribute("mensagemErro", "Você não tem permissão para criar categorias.");
             return "redirect:/dashboard";
@@ -90,19 +87,21 @@ public class DashboardController {
         newCategory.setOrderIndex(orderIndex);
         newCategory.setActive(active);
 
-        categoryRepository.save(newCategory);
+        categoryService.save(newCategory);
 
         attr.addFlashAttribute("mensagemSucesso", "Categoria criada com sucesso!");
         return "redirect:/dashboard";
     }
 
+
+    // Exibe o formulário de edição de uma categoria.
     @GetMapping("/dashboard/editarCategoria/{id}")
     public String editarCategoriaForm(@PathVariable UUID id, Model model, @AuthenticationPrincipal User user) {
         model.addAttribute("user", user);
 
         System.out.println("teste get"); 
-        Category categoria = categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
-        List<Category> categorias = categoryRepository.findAll();
+        Category categoria = categoryService.findById(id).orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+        List<Category> categorias = categoryService.findAll();
 
         categorias.forEach(cat -> cat.setEditing(cat.getId().equals(id)));
 
@@ -110,6 +109,8 @@ public class DashboardController {
         return "user/dashboard"; 
     }
 
+
+    // Processa a edição de uma categoria.
     @PostMapping("/dashboard/editarCategoria/{id}")
     public String salvarCategoriaEditada(@PathVariable UUID id,
                                          @RequestParam String name,
@@ -117,7 +118,7 @@ public class DashboardController {
                                          @RequestParam Integer orderIndex,
                                          @RequestParam Boolean active,
                                          RedirectAttributes attr,
-                                         @AuthenticationPrincipal User user) { // Usuário logado injetado aqui
+                                         @AuthenticationPrincipal User user) {
 
         // Verificação de permissão interna.
         if (!"ADMIN".equals(user.getType())) {
@@ -125,19 +126,20 @@ public class DashboardController {
             return "redirect:/dashboard";
         }
 
-        Category categoria = categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+        Category categoria = categoryService.findById(id).orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
 
         categoria.setName(name);
         categoria.setNature(Nature.valueOf(nature));
         categoria.setOrderIndex(orderIndex);
         categoria.setActive(active);
 
-        categoryRepository.save(categoria);
+        categoryService.save(categoria);
 
         attr.addFlashAttribute("mensagemSucesso", "Categoria atualizada com sucesso!");
         return "redirect:/dashboard";
     }
 
+    // Bloqueia um usuário pelo ID.
     @PostMapping("/usuarios/{id}/bloquear")
     public String bloquearUsuario(@PathVariable UUID id, RedirectAttributes attr, @AuthenticationPrincipal User admin) {
         // Verificação de permissão interna.
@@ -159,6 +161,8 @@ public class DashboardController {
         return "redirect:/dashboard";
     }
 
+
+    // Exclui um usuário do sistema.
     @PostMapping("/usuarios/{id}/excluir")
     public String excluirUsuario(@PathVariable UUID id, RedirectAttributes attr, @AuthenticationPrincipal User admin) {
         // Verificação de permissão interna.
@@ -179,6 +183,8 @@ public class DashboardController {
         return "redirect:/dashboard";
     }
 
+
+    // Desbloqueia um usuário.
     @PostMapping("/usuarios/{id}/desbloquear")
     public String desbloquearUsuario(@PathVariable UUID id, RedirectAttributes attr, @AuthenticationPrincipal User admin) {
         // Verificação de permissão interna.
@@ -189,17 +195,17 @@ public class DashboardController {
 
         User user = userService.findByIdOrThrow(id);
 
-        if (user != null && !"ADMIN".equals(user.getType())) {
+        if (user != null) {
             user.setBlocked(false);
             userService.saveUser(user);
             attr.addFlashAttribute("mensagemSucesso", "Usuário desbloqueado com sucesso!");
-        } else if (user != null && "ADMIN".equals(user.getType())) {
-             attr.addFlashAttribute("mensagemErro", "Não é possível desbloquear outro administrador.");
         }
 
         return "redirect:/dashboard";
     }
 
+
+    // Cadastra um novo usuário.
     @PostMapping("/usuarios/cadastrar")
     public String cadastrarUsuario(@RequestParam String name,
                                    @RequestParam String login,
@@ -227,7 +233,7 @@ public class DashboardController {
         User novoUsuario = new User();
         novoUsuario.setName(name);
         novoUsuario.setLogin(login);
-        novoUsuario.setPassword(password); // será codificado no service
+        novoUsuario.setPassword(password); // A senha será criptografada no service
         novoUsuario.setType(type);
         novoUsuario.setBlocked(false);
 
@@ -236,6 +242,51 @@ public class DashboardController {
         attr.addFlashAttribute("mensagemSucesso", "Usuário cadastrado com sucesso!");
         return "redirect:/dashboard";
     }
+
+    // Exibe o formulário de edição de usuário.
+    @GetMapping("/usuarios/{id}/editar")
+    public String editarUsuarioForm(@PathVariable UUID id, Model model, @AuthenticationPrincipal User admin, RedirectAttributes attr) {
+        if (!"ADMIN".equals(admin.getType())) {
+            attr.addFlashAttribute("mensagemErro", "Você não tem permissão para editar usuários.");
+            return "redirect:/dashboard";
+        }
+
+        User usuario = userService.findByIdOrThrow(id);
+
+        if ("ADMIN".equals(usuario.getType()) && !"ADMIN".equals(admin.getType())) {
+            attr.addFlashAttribute("mensagemErro", "Você não pode editar outro administrador.");
+            return "redirect:/dashboard";
+        }
+
+        model.addAttribute("usuario", usuario);
+        return "user/editar-user";
+    }
+
+
+    // Processa a edição de um usuário
+    @PostMapping("/usuarios/{id}/editar")
+    public String salvarEdicaoUsuario(@PathVariable UUID id,
+                                      @RequestParam String name,
+                                      @RequestParam String login,
+                                      @RequestParam String type,
+                                      @AuthenticationPrincipal User admin,
+                                      RedirectAttributes attr) {
+        if (!"ADMIN".equals(admin.getType())) {
+            attr.addFlashAttribute("mensagemErro", "Você não tem permissão para editar usuários.");
+            return "redirect:/dashboard";
+        }
+
+        User user = userService.findByIdOrThrow(id);
+        user.setName(name);
+        user.setLogin(login);
+        user.setType(type);
+
+        userService.saveUser(user);
+
+        attr.addFlashAttribute("mensagemSucesso", "Usuário atualizado com sucesso!");
+        return "redirect:/dashboard";
+    }
+
 
 
     @GetMapping("/extrato")

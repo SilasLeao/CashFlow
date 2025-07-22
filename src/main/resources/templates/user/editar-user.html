@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Correntista</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav th:insert="layout/main :: header"></nav>
+<div class="container mt-5">
+    <h3>Editar Correntista</h3>
+    <form th:action="@{'/usuarios/' + ${usuario.id} + '/editar'}" method="post" class="row g-3">
+        <div class="col-md-4">
+            <label>Nome</label>
+            <input type="text" name="name" th:value="${usuario.name}" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+            <label>Login</label>
+            <input type="text" name="login" th:value="${usuario.login}" class="form-control" required>
+        </div>
+        <div class="col-md-4">
+            <label>Tipo</label>
+            <select name="type" class="form-select" required>
+                <option value="NORMAL" th:selected="${usuario.type == 'NORMAL'}">NORMAL</option>
+                <option value="ADMIN" th:selected="${usuario.type == 'ADMIN'}">ADMIN</option>
+            </select>
+        </div>
+        <div class="col-md-12">
+            <button type="submit" class="btn btn-success">Salvar</button>
+            <a href="/dashboard" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

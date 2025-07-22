@@ -159,16 +159,19 @@
                     </td>
                     <td>
                         <div th:if="${u.type != 'ADMIN'}">
+                            <form th:action="@{'/usuarios/' + ${u.id} + '/editar'}" method="get" class="d-inline">
+                                <button class="btn btn-primary btn-sm">Editar</button>
+                            </form>
                             <form th:action="@{'/usuarios/' + ${u.id} + '/bloquear'}" method="post" th:if="${!u.blocked}">
                                 <button class="btn btn-warning btn-sm">Bloquear</button>
-                            </form>
-                            <form th:action="@{'/usuarios/' + ${u.id} + '/desbloquear'}" method="post" th:if="${u.blocked}">
-                                <button class="btn btn-success btn-sm">Desbloquear</button>
                             </form>
                             <form th:action="@{'/usuarios/' + ${u.id} + '/excluir'}" method="post" class="d-inline">
                                 <button class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este usuário?')">Excluir</button>
                             </form>
                         </div>
+                        <form th:action="@{'/usuarios/' + ${u.id} + '/desbloquear'}" method="post" th:if="${u.blocked}">
+                            <button class="btn btn-success btn-sm">Desbloquear</button>
+                        </form>
                     </td>
                 </tr>
 
