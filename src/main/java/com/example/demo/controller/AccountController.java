@@ -86,15 +86,10 @@ public class AccountController {
     // Exibe o formulário de edição de conta
     @GetMapping("/editar/{id}")
     public ModelAndView editarConta(@PathVariable UUID id, @AuthenticationPrincipal User user) {
-        if (!"ADMIN".equals(user.getType())) {
-            // bloqueia acesso se não for ADMIN
-            return new ModelAndView("redirect:/contas");
-        }
 
         Account conta = accountService.findByIdOrThrow(id);
         ModelAndView mav = new ModelAndView("user/editar-conta");
         mav.addObject("conta", conta);
-        //mav.addObject("usuarios", userService.findAll());
         mav.addObject("tiposConta", AccountType.values());
         return mav;
     }
@@ -112,12 +107,27 @@ public class AccountController {
         conta.setDescription(contaAtualizada.getDescription());
         conta.setType(contaAtualizada.getType());
 
-        // if ("ADMIN".equals(currentUser.getType()) && userId != null) {
-        //     User user = userService.findByIdOrThrow(userId);
-        //     conta.setUser(user);
-        // }
-
         accountService.save(conta);
+        return "redirect:/contas";
+    }
+
+
+    @PostMapping("/excluir/{id}")
+    public String excluirConta(@PathVariable UUID id,
+                               @AuthenticationPrincipal User currentUser,
+                               RedirectAttributes attr) {
+        Account conta = accountService.findByIdOrThrow(id);
+
+        boolean isAdmin = "ADMIN".equals(currentUser.getType());
+        boolean isOwner = conta.getUser().getId().equals(currentUser.getId());
+
+        if (!isAdmin && !isOwner) {
+            attr.addFlashAttribute("errorMessage", "Você não tem permissão para excluir esta conta.");
+            return "redirect:/contas";
+        }
+
+        accountService.deleteById(id);
+        attr.addFlashAttribute("mensagemSucesso", "Conta excluída com sucesso!");
         return "redirect:/contas";
     }
 

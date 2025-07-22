@@ -52,4 +52,10 @@ public class AccountService {
         return accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Conta não encontrada com o ID: " + id));
     }
+
+    // Deleta uma conta pelo ID
+    public void deleteById(UUID id) {
+        Account conta = findByIdOrThrow(id);
+        accountRepository.delete(conta);
+    }
 }

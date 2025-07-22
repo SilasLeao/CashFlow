@@ -60,8 +60,18 @@
                 <td th:text="${conta.type}">Tipo</td>
                 <td th:text="${#temporals.format(conta.finishDay, 'dd/MM/yyyy')}">Validade</td>
                 <td th:text="${conta.user.name}">Usuário</td>
-                <td th:if="${user.type == 'ADMIN'}">
-                    <a th:href="@{'/contas/editar/' + ${conta.id}}" class="btn btn-primary btn-sm">Editar</a>
+                <td>
+                    <a th:if="${user.type == 'ADMIN'}"
+                       th:href="@{'/contas/editar/' + ${conta.id}}"
+                       class="btn btn-primary btn-sm">Editar</a>
+
+                    <form th:if="${user.type == 'ADMIN' or conta.user.id == user.id}"
+                          th:action="@{'/contas/excluir/' + ${conta.id}}"
+                          method="post"
+                          style="display:inline;"
+                          onsubmit="return confirm('Tem certeza que deseja excluir esta conta?');">
+                        <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                    </form>
                 </td>
             </tr>
         </tbody>
