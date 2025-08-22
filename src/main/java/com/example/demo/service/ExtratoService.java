@@ -5,7 +5,11 @@ import com.example.demo.repo.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ExtratoService {
@@ -13,17 +17,16 @@ public class ExtratoService {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    // Exemplo: retorna transações do mês atual (simulação simples)
-    public List<Transaction> getExtratoDoMes() {
-        UUID contaSimuladaId = UUID.fromString("00000000-0000-0000-0000-000000000001"); // simule ou pegue via usuário
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        Date inicio = calendar.getTime();
-        calendar.add(Calendar.MONTH, 1);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.add(Calendar.DATE, -1);
-        Date fim = calendar.getTime();
+    public List<Transaction> getExtrato(UUID accountId, LocalDate start, LocalDate end) {
+        if (accountId == null) return List.of();
 
-        return transactionRepository.findByAccount_IdAndDateBetween(contaSimuladaId, inicio, fim);
+        LocalDate firstDay = (start != null) ? start : LocalDate.now().withDayOfMonth(1);
+        LocalDate lastDay = (end != null) ? end : LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
+
+
+        Date inicio = Date.from(firstDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date fim = Date.from(lastDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        return transactionRepository.findByAccount_IdAndDateBetween(accountId, inicio, fim);
     }
 }
