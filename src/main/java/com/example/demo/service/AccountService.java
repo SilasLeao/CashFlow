@@ -5,6 +5,10 @@ import com.example.demo.models.users.User;
 import com.example.demo.repo.AccountRepository;
 import com.example.demo.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +36,18 @@ public class AccountService {
     // Retorna as contas de um usuário específico
     public List<Account> findByUser(User user) {
         return accountRepository.findByUser(user);
+    }
+
+    // Paginação para todas as contas
+    public Page<Account> findPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("number"));
+        return accountRepository.findAll(pageable);
+    }
+
+    // Paginação para contas de um usuário específico
+    public Page<Account> findByUserPaginated(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("number"));
+        return accountRepository.findByUser(user, pageable);
     }
 
     // Salva uma nova conta ou atualiza uma existente

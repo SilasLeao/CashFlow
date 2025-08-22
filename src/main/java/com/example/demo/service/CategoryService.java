@@ -4,6 +4,10 @@ import com.example.demo.models.transactions.Category;
 import com.example.demo.repo.CategoryRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,6 +39,11 @@ public class CategoryService {
     public Category findByIdOrThrow(UUID id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+    }
+
+    public Page<Category> findPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("orderIndex"));
+        return categoryRepository.findAll(pageable);
     }
 
     public List<Category> findActiveCategories() {

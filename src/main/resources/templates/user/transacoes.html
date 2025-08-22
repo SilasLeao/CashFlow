@@ -65,6 +65,7 @@
             <td th:text="${t.comment?.text ?: 'Sem comentário'}"></td>
             <td>
                 <a th:href="@{/transacoes/{id}/editar(id=${t.id})}" class="btn btn-sm btn-warning">Editar</a>
+                <a th:href="@{/transacoes/{id}/comentario(id=${t.id})}" class="btn btn-sm btn-info">Comentário</a>
             </td>
         </tr>
         </tbody>

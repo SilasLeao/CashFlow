@@ -1,49 +1,58 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <nav th:insert="layout/main :: header"></nav>
 
 <div th:fragment="content" class="container mt-4">
-    <h2>Nova Conta</h2>
+    <!-- Botão para expandir/colapsar o formulário -->
+    <button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#formNovaConta" aria-expanded="false" aria-controls="formNovaConta">
+        + Nova Conta
+    </button>
 
-    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
-        <p th:text="${errorMessage}"></p>
+    <!-- Formulário retrátil -->
+    <div class="collapse" id="formNovaConta">
+        <div class="card card-body">
+            <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                <p th:text="${errorMessage}"></p>
+            </div>
+
+            <div th:if="${mensagemSucesso}" class="alert alert-success" role="alert" th:text="${mensagemSucesso}"></div>
+
+            <form th:action="@{/contas/nova}" method="post" th:object="${conta}">
+                <div class="mb-3">
+                    <label for="number" class="form-label">Número</label>
+                    <input type="text" th:field="*{number}" class="form-control" id="number" required />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Descrição</label>
+                    <input type="text" th:field="*{description}" class="form-control" id="description" required />
+                </div>
+                <div class="mb-3">
+                    <label for="type" class="form-label">Tipo</label>
+                    <select th:field="*{type}" class="form-control" id="type">
+                        <option value="CORRENTE">CORRENTE</option>
+                        <option value="CARTAO">CARTAO</option>
+                    </select>
+                </div>
+                <div th:if="${user.type == 'ADMIN'}" class="mb-3">
+                    <label for="usuario" class="form-label">Usuário</label>
+                    <select name="userId" id="usuario" class="form-select" required>
+                        <option value="" disabled selected>Selecione o usuário</option>
+                        <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.name}"></option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">Salvar</button>
+            </form>
+        </div>
     </div>
-    
-    <div th:if="${mensagemSucesso}" class="alert alert-success" role="alert" th:text="${mensagemSucesso}"></div>
-    
-    <form th:action="@{/contas/nova}" method="post" th:object="${conta}">
-        <div class="mb-3">
-            <label for="number" class="form-label">Número</label>
-            <input type="text" th:field="*{number}" class="form-control" id="number" required />
-        </div>
-        <div class="mb-3">
-            <label for="description" class="form-label">Descrição</label>
-            <input type="text" th:field="*{description}" class="form-control" id="description" required />
-        </div>
-        <div class="mb-3">
-            <label for="type" class="form-label">Tipo</label>
-            <select th:field="*{type}" class="form-control" id="type">
-                 <option value="CORRENTE">CORRENTE</option>
-                 <option value="CARTAO">CARTAO</option>
-            </select>
-        </div>
-        <div th:if="${user.type == 'ADMIN'}" class="mb-3">
-            <label for="usuario" class="form-label">Usuário</label>
-            <select name="userId" id="usuario" class="form-select" required>
-                <option value="" disabled selected>Selecione o usuário</option>
-                <option th:each="u : ${usuarios}" th:value="${u.id}" th:text="${u.name}"></option>
-            </select>
-        </div>
-        <button type="submit" class="btn btn-success">Salvar</button>
-    </form>
 
+    <!-- Lista de contas -->
     <div class="container mt-4">
-    <h2>Contas</h2>
-
-    <table class="table table-striped">
-        <thead>
+        <h2>Contas</h2>
+        <table class="table table-striped">
+            <thead>
             <tr>
                 <th>Número</th>
                 <th>Descrição</th>
@@ -52,8 +61,8 @@
                 <th>Usuário</th>
                 <th th:if="${user.type == 'ADMIN'}">Ações</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr th:each="conta : ${contas}">
                 <td th:text="${conta.number}">Número</td>
                 <td th:text="${conta.description}">Descrição</td>
@@ -74,8 +83,24 @@
                     </form>
                 </td>
             </tr>
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex mt-3">
+        <nav>
+            <ul class="pagination pagination-sm">
+                <li class="page-item" th:classappend="${contasCurrentPage == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/contas(page=${contasCurrentPage - 1})}"><-</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, contasTotalPages - 1)}"
+                    th:classappend="${i == contasCurrentPage} ? 'active'">
+                    <a class="page-link" th:href="@{/contas(page=${i})}" th:text="${i + 1}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${contasCurrentPage + 1 >= contasTotalPages} ? 'disabled'">
+                    <a class="page-link" th:href="@{/contas(page=${contasCurrentPage + 1})}">-></a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
 </html>
