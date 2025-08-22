@@ -7,9 +7,7 @@
     <style>
         .category-menu { display: inline-flex; gap: .5rem; position: relative; }
         .category-item { position: relative; }
-        .category-trigger {
-            min-width: 150px;
-        }
+        .category-trigger { min-width: 150px; }
         .category-submenu {
             display: none;
             position: absolute;
@@ -39,137 +37,131 @@
             cursor: pointer;
         }
         .cat-option:hover { background: rgba(0,0,0,.05); }
-
         .cat-radio:checked + label.cat-option {
             background: var(--bs-primary);
             color: #fff;
         }
-
     </style>
 </head>
 
 <body>
-    <nav th:insert="~{layout/main :: header}"></nav>
+<nav th:insert="~{layout/main :: header}"></nav>
 
-    <div class="container mt-4">
-        <h2 th:text="${transaction.id == null ? 'Nova Transação' : 'Editar Transação'}">Formulário de Transação</h2>
-        <hr>
+<div class="container mt-4">
+    <h2 th:text="${transaction.id == null ? 'Nova Transação' : 'Editar Transação'}">Formulário de Transação</h2>
+    <hr>
 
-        <form th:action="${transaction.id == null} ? @{/transacoes/criar} : @{/transacoes/{id}/editar(id=${transaction.id})}"
-              th:object="${transaction}" method="post">
+    <form th:action="${transaction.id == null} ? @{/transacoes/criar} : @{/transacoes/{id}/editar(id=${transaction.id})}"
+          th:object="${transaction}" method="post">
 
-            <div class="mb-3">
-                <label for="description" class="form-label">Descrição</label>
-                <input type="text" class="form-control" id="description" th:field="*{description}" required>
-            </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Descrição</label>
+            <input type="text" class="form-control" id="description" th:field="*{description}" required>
+        </div>
 
-            <div class="mb-3">
-                <label for="value" class="form-label">Valor</label>
-                <input type="number" step="0.01" class="form-control" id="value" th:field="*{value}" required>
-            </div>
+        <div class="mb-3">
+            <label for="value" class="form-label">Valor</label>
+            <input type="number" step="0.01" class="form-control" id="value" th:field="*{value}" required>
+        </div>
 
-            <div class="mb-3">
-                <label for="movement" class="form-label">Movimento</label>
-                <select class="form-select" id="movement" th:field="*{movement}" required>
-                    <option value="">Selecione o tipo</option>
-                    <option th:each="type : ${movementTypes}" th:value="${type}" th:text="${type.name()}"></option>
-                </select>
-            </div>
+        <div class="mb-3">
+            <label for="movement" class="form-label">Movimento</label>
+            <select class="form-select" id="movement" th:field="*{movement}" required>
+                <option value="">Selecione o tipo</option>
+                <option th:each="type : ${movementTypes}" th:value="${type}" th:text="${type.name()}"></option>
+            </select>
+        </div>
 
-            <div class="mb-3">
-                <label for="account" class="form-label">Conta</label>
-                <select class="form-select" id="account" name="accountId" required>
-                    <option value="">Selecione uma conta</option>
-                    <option th:each="acc : ${userAccounts}"
-                            th:value="${acc.id}"
-                            th:text="${acc.description}"
-                            th:selected="${transaction.account != null and transaction.account.id == acc.id}">
-                    </option>
-                </select>
-            </div>
+        <div class="mb-3">
+            <label for="account" class="form-label">Conta</label>
+            <select class="form-select" id="account" name="accountId" required>
+                <option value="">Selecione uma conta</option>
+                <option th:each="acc : ${userAccounts}"
+                        th:value="${acc.id}"
+                        th:text="${acc.description}"
+                        th:selected="${transaction.account != null and transaction.account.id == acc.id}">
+                </option>
+            </select>
+        </div>
 
-            <div class="mb-3">
-                <label class="form-label d-block">Categoria</label>
+        <div class="mb-3">
+            <label class="form-label d-block">Categoria</label>
 
-                <!-- Grupo de tipos -->
-                <div class="category-menu">
+            <div class="category-menu">
 
-                    <!-- ENTRADA -->
-                    <div class="category-item">
-                        <button type="button" class="btn btn-success category-trigger">ENTRADA</button>
-                        <div class="category-submenu">
-                            <div class="list-group list-group-flush">
-                                <div th:each="cat : ${categories}"
-                                     th:if="${cat.nature == T(com.example.demo.models.enums.Nature).ENTRADA}">
-                                    <!-- radio invisível que de fato envia o valor -->
-                                    <input class="cat-radio"
-                                           type="radio"
-                                           name="categoryId"
-                                           th:id="${'cat_' + cat.id}"
-                                           th:value="${cat.id}"
-                                           th:checked="${transaction.category != null and transaction.category.id == cat.id}">
-                                    <!-- o label é o item clicável -->
-                                    <label class="cat-option" th:for="${'cat_' + cat.id}" th:text="${cat.name}"></label>
-                                </div>
+                <!-- ENTRADA -->
+                <div class="category-item">
+                    <button type="button" class="btn btn-success category-trigger">ENTRADA</button>
+                    <div class="category-submenu">
+                        <div class="list-group list-group-flush">
+                            <div th:each="cat : ${categories}"
+                                 th:if="${cat.nature.name() == T(com.example.demo.models.enums.Nature).ENTRADA.name()}">
+                                <input class="cat-radio"
+                                       type="radio"
+                                       name="categoryId"
+                                       th:id="${'cat_' + cat.id}"
+                                       th:value="${cat.id}"
+                                       th:checked="${transaction.category != null and transaction.category.id == cat.id}">
+                                <label class="cat-option" th:for="${'cat_' + cat.id}" th:text="${cat.name}"></label>
                             </div>
                         </div>
                     </div>
-
-                    <!-- SAÍDA -->
-                    <div class="category-item">
-                        <button type="button" class="btn btn-danger category-trigger">SAÍDA</button>
-                        <div class="category-submenu">
-                            <div class="list-group list-group-flush">
-                                <div th:each="cat : ${categories}"
-                                     th:if="${cat.nature == T(com.example.demo.models.enums.Nature).SAIDA}">
-                                    <input class="cat-radio"
-                                           type="radio"
-                                           name="categoryId"
-                                           th:id="${'cat_' + cat.id}"
-                                           th:value="${cat.id}"
-                                           th:checked="${transaction.category != null and transaction.category.id == cat.id}">
-                                    <label class="cat-option" th:for="${'cat_' + cat.id}" th:text="${cat.name}"></label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- INVESTIMENTO -->
-                    <div class="category-item">
-                        <button type="button" class="btn btn-warning category-trigger">INVESTIMENTO</button>
-                        <div class="category-submenu">
-                            <div class="list-group list-group-flush">
-                                <div th:each="cat : ${categories}"
-                                     th:if="${cat.nature == T(com.example.demo.models.enums.Nature).INVESTIMENTO}">
-                                    <input class="cat-radio"
-                                           type="radio"
-                                           name="categoryId"
-                                           th:id="${'cat_' + cat.id}"
-                                           th:value="${cat.id}"
-                                           th:checked="${transaction.category != null and transaction.category.id == cat.id}">
-                                    <label class="cat-option" th:for="${'cat_' + cat.id}" th:text="${cat.name}"></label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
 
-                <!-- Dica opcional -->
-                <div class="form-text mt-2">
-                    Passe o mouse sobre um tipo para ver as categorias. Clique para selecionar.
+                <!-- SAÍDA -->
+                <div class="category-item">
+                    <button type="button" class="btn btn-danger category-trigger">SAÍDA</button>
+                    <div class="category-submenu">
+                        <div class="list-group list-group-flush">
+                            <div th:each="cat : ${categories}"
+                                 th:if="${cat.nature.name() == T(com.example.demo.models.enums.Nature).SAIDA.name()}">
+                                <input class="cat-radio"
+                                       type="radio"
+                                       name="categoryId"
+                                       th:id="${'cat_' + cat.id}"
+                                       th:value="${cat.id}"
+                                       th:checked="${transaction.category != null and transaction.category.id == cat.id}">
+                                <label class="cat-option" th:for="${'cat_' + cat.id}" th:text="${cat.name}"></label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- INVESTIMENTO -->
+                <div class="category-item">
+                    <button type="button" class="btn btn-warning category-trigger">INVESTIMENTO</button>
+                    <div class="category-submenu">
+                        <div class="list-group list-group-flush">
+                            <div th:each="cat : ${categories}"
+                                 th:if="${cat.nature.name() == T(com.example.demo.models.enums.Nature).INVESTIMENTO.name()}">
+                                <input class="cat-radio"
+                                       type="radio"
+                                       name="categoryId"
+                                       th:id="${'cat_' + cat.id}"
+                                       th:value="${cat.id}"
+                                       th:checked="${transaction.category != null and transaction.category.id == cat.id}">
+                                <label class="cat-option" th:for="${'cat_' + cat.id}" th:text="${cat.name}"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="mb-3">
-                <label for="date" class="form-label">Data da Transação</label>
-                <input type="date" class="form-control" id="date" th:field="*{date}" th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
+            <div class="form-text mt-2">
+                Passe o mouse sobre um tipo para ver as categorias. Clique para selecionar.
             </div>
+        </div>
 
-            <button type="submit" class="btn btn-primary">Salvar</button>
-            <a th:href="@{/transacoes}" class="btn btn-secondary">Cancelar</a>
-        </form>
-    </div>
+        <div class="mb-3">
+            <label for="date" class="form-label">Data da Transação</label>
+            <input type="date" class="form-control" id="date" th:field="*{date}" th:attr="min=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a th:href="@{/transacoes}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
 
 </body>
 </html>

@@ -86,7 +86,7 @@
             </tbody>
         </table>
     </div>
-    <div class="d-flex mt-3">
+    <div class="d-flex mt-3" th:if="${contasTotalPages > 0}">
         <nav>
             <ul class="pagination pagination-sm">
                 <li class="page-item" th:classappend="${contasCurrentPage == 0} ? 'disabled'">
@@ -102,5 +102,6 @@
             </ul>
         </nav>
     </div>
+
 </div>
 </html>
