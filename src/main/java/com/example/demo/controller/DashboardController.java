@@ -298,24 +298,6 @@ public class DashboardController {
         return "redirect:/dashboard";
     }
 
-
-
-    @GetMapping("/extrato")
-    public String showExtrato(Model model, @AuthenticationPrincipal User user) { 
-        model.addAttribute("user", user); 
-        List<Transaction> extrato = extratoService.getExtratoDoMes();
-        model.addAttribute("extrato", extrato);
-        return "user/extrato"; 
-    }
-
-    @GetMapping("/orcamento")
-    public String showOrcamentoAnual(Model model, @AuthenticationPrincipal User user) { 
-        model.addAttribute("user", user);
-        var planilha = orcamentoService.getPlanilhaOrcamento();
-        model.addAttribute("planilha", planilha);
-        return "user/orcamento";
-    }
-
     @GetMapping("/")
     public String redirectToDashboard() {
         return "redirect:/dashboard";

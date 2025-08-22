@@ -17,4 +17,5 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     List<Account> findByUser(User user);
     Page<Account> findByUser(User user, Pageable pageable); // NOVO
     boolean existsByNumber(String number);
+    List<Account> findByUser_Id(UUID userId);
 }

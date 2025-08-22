@@ -56,6 +56,10 @@ public class User implements UserDetails {
         return !this.isBlocked;
     }
 
+    public boolean isAdmin() {
+        return "ADMIN".equalsIgnoreCase(this.type);
+    }
+
     @Override
     public boolean isCredentialsNonExpired() {
         return true;

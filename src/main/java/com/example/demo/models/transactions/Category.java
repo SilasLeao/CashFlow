@@ -48,4 +48,12 @@ public class Category {
             CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
     private List<Transaction> transactions;
 
+
+    public Nature getNatureza() {
+        return this.nature;
+    }
+
+    public Integer getOrdem() {
+        return this.orderIndex != null ? this.orderIndex : 0;
+    }
 }
