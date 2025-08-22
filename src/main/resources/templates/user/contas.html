@@ -86,5 +86,21 @@
             </tbody>
         </table>
     </div>
+    <div class="d-flex mt-3">
+        <nav>
+            <ul class="pagination pagination-sm">
+                <li class="page-item" th:classappend="${contasCurrentPage == 0} ? 'disabled'">
+                    <a class="page-link" th:href="@{/contas(page=${contasCurrentPage - 1})}"><-</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, contasTotalPages - 1)}"
+                    th:classappend="${i == contasCurrentPage} ? 'active'">
+                    <a class="page-link" th:href="@{/contas(page=${i})}" th:text="${i + 1}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${contasCurrentPage + 1 >= contasTotalPages} ? 'disabled'">
+                    <a class="page-link" th:href="@{/contas(page=${contasCurrentPage + 1})}">-></a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
 </html>

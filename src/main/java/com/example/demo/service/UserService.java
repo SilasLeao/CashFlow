@@ -4,6 +4,10 @@ import com.example.demo.models.users.User;
 import com.example.demo.repo.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +37,11 @@ public class UserService {
     public User findByIdOrThrow(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    }
+
+    public Page<User> findPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name"));
+        return userRepository.findAll(pageable);
     }
 
     public List<User> findAll() {

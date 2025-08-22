@@ -16,6 +16,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 
 @Controller
 @RequestMapping("/contas")
@@ -30,21 +35,29 @@ public class AccountController {
 
     // Exibe a tela de listagem de contas
     @GetMapping
-    public ModelAndView listAccounts(@AuthenticationPrincipal User user, ModelAndView mav) {
+    public ModelAndView listAccounts(
+            @AuthenticationPrincipal User user,
+            @RequestParam(defaultValue = "0") int page,
+            ModelAndView mav) {
+
         mav = new ModelAndView("user/contas");
 
-        // ADMIN vê todas as contas, usuário normal só as suas
-        List<Account> contas = "ADMIN".equals(user.getType())
-                ? accountService.findAll()
-                : accountService.findByUser(user);
-
-        mav.addObject("contas", contas);
-        mav.addObject("conta", new Account());
-        mav.addObject("user", user);
+        int pageSize = 10;
+        Page<Account> contasPage;
 
         if ("ADMIN".equals(user.getType())) {
+            contasPage = accountService.findPaginated(page, pageSize);
             mav.addObject("usuarios", userService.findAll());
+        } else {
+            contasPage = accountService.findByUserPaginated(user, page, pageSize);
         }
+
+        mav.addObject("contas", contasPage.getContent());
+        mav.addObject("contasTotalPages", contasPage.getTotalPages());
+        mav.addObject("contasCurrentPage", page);
+
+        mav.addObject("conta", new Account());
+        mav.addObject("user", user);
 
         return mav;
     }

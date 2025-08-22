@@ -108,6 +108,24 @@
 
             </table>
         </div>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" th:classappend="${categoriasCurrentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/dashboard(pageCategories=${categoriasCurrentPage - 1}, pageUsers=${usuariosCurrentPage})}"><-</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, categoriasTotalPages - 1)}"
+                            th:classappend="${i == categoriasCurrentPage} ? 'active'">
+                            <a class="page-link" th:href="@{/dashboard(pageCategories=${i}, pageUsers=${usuariosCurrentPage})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${categoriasCurrentPage + 1 >= categoriasTotalPages} ? 'disabled'">
+                            <a class="page-link" th:href="@{/dashboard(pageCategories=${categoriasCurrentPage + 1}, pageUsers=${usuariosCurrentPage})}">-></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
 
         <h5 class="mt-5">Cadastrar Novo Correntista</h5>
         <form th:action="@{/usuarios/cadastrar}" method="post" class="row g-3">
@@ -177,6 +195,24 @@
 
                 </tbody>
             </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+            <div>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item" th:classappend="${usuariosCurrentPage == 0} ? 'disabled'">
+                            <a class="page-link" th:href="@{/dashboard(pageUsers=${usuariosCurrentPage - 1}, pageCategories=${categoriasCurrentPage})}"><-</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, usuariosTotalPages - 1)}"
+                            th:classappend="${i == usuariosCurrentPage} ? 'active'">
+                            <a class="page-link" th:href="@{/dashboard(pageUsers=${i}, pageCategories=${categoriasCurrentPage})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${usuariosCurrentPage + 1 >= usuariosTotalPages} ? 'disabled'">
+                            <a class="page-link" th:href="@{/dashboard(pageUsers=${usuariosCurrentPage + 1}, pageCategories=${categoriasCurrentPage})}">-></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
 
 

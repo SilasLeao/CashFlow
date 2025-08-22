@@ -34,20 +34,31 @@ public class DashboardController {
 
     // Exibe a tela de dashboard para usuários autenticados.
     @GetMapping("/dashboard")
-    public String showDashboard(Model model, @AuthenticationPrincipal User user) {
-        // O Spring Security já garante que apenas usuários autenticados cheguem aqui
+    public String showDashboard(
+            Model model,
+            @AuthenticationPrincipal User user,
+            @RequestParam(defaultValue = "0") int pageCategories,
+            @RequestParam(defaultValue = "0") int pageUsers) {
+
         if ("NORMAL".equals(user.getType())) {
             return "redirect:/contas";
         }
 
         model.addAttribute("user", user);
 
-        // Se o usuário for ADMIN, busca usuários e categorias adicionais.
         if ("ADMIN".equals(user.getType())) {
-            List<User> usuarios = userService.findAll();
-            model.addAttribute("usuarios", usuarios);
-            List<Category> categorias = categoryService.findAll();
-            model.addAttribute("categorias", categorias);
+            // Paginação de categorias
+            int pageSize = 10;
+            var categoriasPage = categoryService.findPaginated(pageCategories, pageSize);
+            model.addAttribute("categorias", categoriasPage.getContent());
+            model.addAttribute("categoriasTotalPages", categoriasPage.getTotalPages());
+            model.addAttribute("categoriasCurrentPage", pageCategories);
+
+            // Paginação de usuários
+            var usuariosPage = userService.findPaginated(pageUsers, pageSize);
+            model.addAttribute("usuarios", usuariosPage.getContent());
+            model.addAttribute("usuariosTotalPages", usuariosPage.getTotalPages());
+            model.addAttribute("usuariosCurrentPage", pageUsers);
         }
 
         return "user/dashboard";
