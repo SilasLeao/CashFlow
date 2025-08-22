@@ -93,20 +93,30 @@ public class TransactionController {
     /**
      * Salva as alterações da transação editada.
      */
-     @PostMapping("/{id}/editar")
+    @PostMapping("/{id}/editar")
     public String updateTransaction(@PathVariable UUID id,
-                                    @ModelAttribute("transaction") Transaction transaction,
+                                    @ModelAttribute("transaction") Transaction formTransaction,
                                     @RequestParam("accountId") UUID accountId,
                                     @RequestParam("categoryId") UUID categoryId) {
-        transaction.setId(id);
+        // Busca a transação existente
+        Transaction existing = transactionService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("ID inválido: " + id));
 
+        // Atualiza apenas os campos editáveis
+        existing.setDescription(formTransaction.getDescription());
+        existing.setValue(formTransaction.getValue());
+        existing.setMovement(formTransaction.getMovement());
+        existing.setDate(formTransaction.getDate());
+
+        // Atualiza as relações de conta e categoria
         Account selectedAccount = accountService.findByIdOrThrow(accountId);
         Category selectedCategory = categoryService.findByIdOrThrow(categoryId);
+        existing.setAccount(selectedAccount);
+        existing.setCategory(selectedCategory);
 
-         transaction.setAccount(selectedAccount);
-         transaction.setCategory(selectedCategory);
+        // NÃO mexe em existing.getComment() (mantém o que já existe)
+        transactionService.save(existing);
 
-        transactionService.save(transaction);
         return "redirect:/transacoes";
     }
     
@@ -167,6 +177,42 @@ public class TransactionController {
         model.addAttribute("selectedAccountId", finalSelectedAccountId);
 
         return "user/transacoes";
+    }
+
+    /**
+     * Exibe o formulário de comentário.
+     */
+    @GetMapping("/{id}/comentario")
+    public String showCommentForm(@PathVariable UUID id, Model model) {
+        Transaction transaction = transactionService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("ID inválido: " + id));
+
+        if (transaction.getComment() == null) {
+            transaction.setComment(new Comment());
+        }
+
+        model.addAttribute("transaction", transaction);
+        return "user/formulario-comentario";
+    }
+
+    /**
+     * Salva o comentário.
+     */
+    @PostMapping("/{id}/comentario")
+    public String saveComment(@PathVariable UUID id,
+                              @ModelAttribute("transaction") Transaction transaction) {
+        // Busca a transação original
+        Transaction existing = transactionService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("ID inválido: " + id));
+
+        // Atualiza apenas o comentário
+        if (existing.getComment() == null) {
+            existing.setComment(new Comment());
+        }
+        existing.getComment().setText(transaction.getComment().getText());
+
+        transactionService.save(existing);
+        return "redirect:/transacoes";
     }
 
 }

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Comentário</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav th:insert="~{layout/main :: header}"></nav>
+
+<div class="container mt-4">
+    <h2>Comentário da Transação</h2>
+    <hr>
+
+    <form th:action="@{/transacoes/{id}/comentario(id=${transaction.id})}"
+          th:object="${transaction}" method="post">
+
+        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{comment.id}" />
+
+        <div class="mb-3">
+            <label for="comment" class="form-label">Comentário</label>
+            <textarea id="comment" class="form-control" rows="4"
+                      th:field="*{comment.text}" placeholder="Digite o comentário"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a th:href="@{/transacoes}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+</body>
+</html>
