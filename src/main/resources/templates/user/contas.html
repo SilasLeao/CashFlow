@@ -21,13 +21,13 @@
             + Nova Conta
         </button>
 
-        <div class="collapse" id="formNovaConta" th:classappend="${#fields.hasErrors('conta')} ? 'show' : ''">
-            <div class="card card-body">
-                <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
-                    <p th:text="${errorMessage}"></p>
-                </div>
-                <div th:if="${mensagemSucesso}" class="alert alert-success" role="alert" th:text="${mensagemSucesso}"></div>
+        <!-- ALERTAS FORA DO COLLAPSE -->
+        <div th:if="${errorMessage}" class="alert alert-danger mt-2" role="alert" th:text="${errorMessage}"></div>
+        <div th:if="${mensagemSucesso}" class="alert alert-success mt-2" role="alert" th:text="${mensagemSucesso}"></div>
 
+        <!-- FORM COLLAPSE -->
+        <div class="collapse mt-3" id="formNovaConta" th:classappend="${#fields.hasErrors('conta')} ? 'show' : ''">
+            <div class="card card-body">
                 <form th:action="@{/contas/nova}" method="post" th:object="${conta}">
                     
                     <div class="mb-3">
@@ -74,6 +74,7 @@
             </div>
         </div>
 
+        <!-- TABELA DE CONTAS -->
         <div class="container mt-4">
             <h2>Contas</h2>
             <table class="table table-striped">
@@ -113,7 +114,7 @@
         </div>
         
         <div class="d-flex mt-3" th:if="${contasTotalPages > 0}">
-           </div>
+        </div>
     </div>
 </body>
 </html>

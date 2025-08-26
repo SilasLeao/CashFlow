@@ -207,6 +207,7 @@ public class DashboardController {
 
             return "user/dashboard";
         }
+        
 
         // Lógica de negócio original
         if (userService.loginExists(novoUsuario.getLogin())) {

@@ -37,7 +37,8 @@ public class AccountController {
     @GetMapping
     public ModelAndView listAccounts(
             @AuthenticationPrincipal User user,
-            @RequestParam(defaultValue = "0") int page) {
+            @RequestParam(defaultValue = "0") int page,
+            Model model) {
 
         ModelAndView mav = new ModelAndView("user/contas");
         int pageSize = 10;
@@ -55,9 +56,15 @@ public class AccountController {
         mav.addObject("contasCurrentPage", page);
         mav.addObject("conta", new Account());
         mav.addObject("user", user);
-
-        // 🔥 precisa adicionar sempre
         mav.addObject("tiposConta", AccountType.values());
+
+        // Mensagens de flash (error ou sucesso)
+        if (model.containsAttribute("errorMessage")) {
+            mav.addObject("errorMessage", model.getAttribute("errorMessage"));
+        }
+        if (model.containsAttribute("mensagemSucesso")) {
+            mav.addObject("mensagemSucesso", model.getAttribute("mensagemSucesso"));
+        }
 
         return mav;
     }
@@ -74,13 +81,12 @@ public class AccountController {
     // Salvar nova conta
     @PostMapping("/nova")
     public String salvarConta(@Valid @ModelAttribute("conta") Account account,
-                              BindingResult result, // Deve vir LOGO APÓS o objeto que está sendo validado
-                              @RequestParam(required = false) UUID userId,
-                              @AuthenticationPrincipal User currentUser,
-                              RedirectAttributes attr,
-                              Model model) { // Usado para devolver dados à view em caso de erro
+                            BindingResult result,
+                            @RequestParam(required = false) UUID userId,
+                            @AuthenticationPrincipal User currentUser,
+                            RedirectAttributes attr,
+                            Model model) {
 
-        // PASSO 1: VERIFICAR SE HÁ ERROS DE VALIDAÇÃO
         if (result.hasErrors()) {
             Page<Account> contasPage = currentUser.isAdmin()
                     ? accountService.findPaginated(0, 10)
@@ -92,7 +98,6 @@ public class AccountController {
             model.addAttribute("tiposConta", AccountType.values());
             model.addAttribute("user", currentUser);
 
-            // 🔥 Se for admin, precisa repopular a lista de usuários
             if (currentUser.isAdmin()) {
                 model.addAttribute("usuarios", userService.findAll());
             }
@@ -100,10 +105,8 @@ public class AccountController {
             return "user/contas";
         }
 
-        // PASSO 2: SE NÃO HOUVER ERROS, A LÓGICA ORIGINAL CONTINUA
         if (currentUser.isAdmin() && userId != null) {
-            User selectedUser = userService.findByIdOrThrow(userId);
-            account.setUser(selectedUser);
+            account.setUser(userService.findByIdOrThrow(userId));
         } else {
             account.setUser(currentUser);
         }
