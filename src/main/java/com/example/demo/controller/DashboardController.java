@@ -74,11 +74,8 @@ public class DashboardController {
 
         // Verifica se há erros de validação das anotações (@NotBlank, @NotNull, etc.)
         if (result.hasErrors()) {
-            // Se houver erros, repopula o model com os dados necessários para a página
-            // e retorna para a view para exibir os erros.
             model.addAttribute("user", user);
-            
-            // Repopula os dados da paginação para a view não quebrar
+
             int pageSize = 10;
             var categoriasPage = categoryService.findPaginated(0, pageSize);
             model.addAttribute("categorias", categoriasPage.getContent());
@@ -89,6 +86,11 @@ public class DashboardController {
             model.addAttribute("usuarios", usuariosPage.getContent());
             model.addAttribute("usuariosTotalPages", usuariosPage.getTotalPages());
             model.addAttribute("usuariosCurrentPage", 0);
+
+            // 👇 Adiciona um usuário vazio para o outro formulário não quebrar
+            if (!model.containsAttribute("novoUsuario")) {
+                model.addAttribute("novoUsuario", new User());
+            }
 
             return "user/dashboard";
         }

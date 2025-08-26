@@ -21,11 +21,11 @@
         </div>
         <div class="col-md-3">
             <label for="start" class="form-label">Data Inicial</label>
-            <input type="date" id="start" name="start" class="form-control" th:value="${start}">
+            <input type="date" id="start" name="start" class="form-control" th:value="${start}" required>
         </div>
         <div class="col-md-3">
             <label for="end" class="form-label">Data Final</label>
-            <input type="date" id="end" name="end" class="form-control" th:value="${end}">
+            <input type="date" id="end" name="end" class="form-control" th:value="${end}" required>
         </div>
         <div class="col-md-2 d-flex align-items-end">
             <button type="submit" class="btn btn-primary w-100">Gerar Extrato</button>
