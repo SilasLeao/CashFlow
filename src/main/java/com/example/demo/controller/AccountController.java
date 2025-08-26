@@ -4,23 +4,18 @@ import com.example.demo.models.accounts.Account;
 import com.example.demo.models.enums.AccountType;
 import com.example.demo.models.users.User;
 import com.example.demo.service.AccountService;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize; // -> Importação necessária
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/contas")
@@ -37,15 +32,15 @@ public class AccountController {
     @GetMapping
     public ModelAndView listAccounts(
             @AuthenticationPrincipal User user,
-            @RequestParam(defaultValue = "0") int page,
-            ModelAndView mav) {
+            @RequestParam(defaultValue = "0") int page) {
 
-        mav = new ModelAndView("user/contas");
-
+        ModelAndView mav = new ModelAndView("user/contas");
         int pageSize = 10;
         Page<Account> contasPage;
 
-        if ("ADMIN".equals(user.getType())) {
+        // Lógica de negócio mantida: admin vê dados diferentes do usuário comum.
+        // A verificação foi melhorada para usar o método do próprio usuário.
+        if (user.isAdmin()) {
             contasPage = accountService.findPaginated(page, pageSize);
             mav.addObject("usuarios", userService.findAll());
         } else {
@@ -55,7 +50,6 @@ public class AccountController {
         mav.addObject("contas", contasPage.getContent());
         mav.addObject("contasTotalPages", contasPage.getTotalPages());
         mav.addObject("contasCurrentPage", page);
-
         mav.addObject("conta", new Account());
         mav.addObject("user", user);
 
@@ -73,18 +67,19 @@ public class AccountController {
 
     // Salvar nova conta
     @PostMapping("/nova")
-    public String salvarConta(@ModelAttribute Account account, @RequestParam(required = false) UUID userId, @AuthenticationPrincipal User currentUser, RedirectAttributes attr) {
+    public String salvarConta(@ModelAttribute Account account,
+                              @RequestParam(required = false) UUID userId,
+                              @AuthenticationPrincipal User currentUser,
+                              RedirectAttributes attr) {
 
-        // ADMIN pode escolher outro usuário para vincular a conta
-        if ("ADMIN".equals(currentUser.getType()) && userId != null) {
+        // Lógica de negócio mantida: admin pode criar conta para outros.
+        if (currentUser.isAdmin() && userId != null) {
             User selectedUser = userService.findByIdOrThrow(userId);
             account.setUser(selectedUser);
-        // Usuário comum cria conta para si mesmo
         } else {
             account.setUser(currentUser);
         }
 
-        // Validação que impede a criação de conta com número já existente
         if (accountService.existsByNumber(account.getNumber())) {
             attr.addFlashAttribute("errorMessage", "Já existe uma conta com esse número.");
             return "redirect:/contas";
@@ -97,9 +92,10 @@ public class AccountController {
     }
 
     // Exibe o formulário de edição de conta
+    // REFATORADO: Adicionada verificação de permissão.
     @GetMapping("/editar/{id}")
-    public ModelAndView editarConta(@PathVariable UUID id, @AuthenticationPrincipal User user) {
-
+    @PreAuthorize("hasRole('ADMIN') or @accountService.findByIdOrThrow(#id).user.id == authentication.principal.id")
+    public ModelAndView editarConta(@PathVariable UUID id) {
         Account conta = accountService.findByIdOrThrow(id);
         ModelAndView mav = new ModelAndView("user/editar-conta");
         mav.addObject("conta", conta);
@@ -108,41 +104,27 @@ public class AccountController {
     }
 
     // Atualiza uma conta após o envio do formulário
+    // REFATORADO: Adicionada verificação de permissão.
     @PostMapping("/editar/{id}")
-    public String atualizarConta(@PathVariable UUID id,
-                                 @ModelAttribute Account contaAtualizada,
-                                 @RequestParam(required = false) UUID userId,
-                                 @AuthenticationPrincipal User currentUser) {
-
+    @PreAuthorize("hasRole('ADMIN') or @accountService.findByIdOrThrow(#id).user.id == authentication.principal.id")
+    public String atualizarConta(@PathVariable UUID id, @ModelAttribute Account contaAtualizada) {
         Account conta = accountService.findByIdOrThrow(id);
-
         conta.setNumber(contaAtualizada.getNumber());
         conta.setDescription(contaAtualizada.getDescription());
         conta.setType(contaAtualizada.getType());
-
         accountService.save(conta);
         return "redirect:/contas";
     }
 
-
+    // Exclui uma conta
+    // REFATORADO: Verificação de permissão movida para a anotação.
     @PostMapping("/excluir/{id}")
-    public String excluirConta(@PathVariable UUID id,
-                               @AuthenticationPrincipal User currentUser,
-                               RedirectAttributes attr) {
-        Account conta = accountService.findByIdOrThrow(id);
-
-        boolean isAdmin = "ADMIN".equals(currentUser.getType());
-        boolean isOwner = conta.getUser().getId().equals(currentUser.getId());
-
-        if (!isAdmin && !isOwner) {
-            attr.addFlashAttribute("errorMessage", "Você não tem permissão para excluir esta conta.");
-            return "redirect:/contas";
-        }
-
+    @PreAuthorize("hasRole('ADMIN') or @accountService.findByIdOrThrow(#id).user.id == authentication.principal.id")
+    public String excluirConta(@PathVariable UUID id, RedirectAttributes attr) {
+        // A lógica manual de verificação (if !isAdmin && !isOwner) foi removida daqui.
+        // O método só será executado se o usuário tiver permissão.
         accountService.deleteById(id);
         attr.addFlashAttribute("mensagemSucesso", "Conta excluída com sucesso!");
         return "redirect:/contas";
     }
-
-
 }

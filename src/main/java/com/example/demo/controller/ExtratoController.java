@@ -7,6 +7,7 @@ import com.example.demo.service.AccountService;
 import com.example.demo.service.ExtratoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,7 +27,9 @@ public class ExtratoController {
     @Autowired
     private AccountService accountService;
 
+    // -> Permite que qualquer usuário autenticado acesse esta página.
     @GetMapping("/extrato")
+    @PreAuthorize("isAuthenticated()")
     public String viewExtrato(
             Model model,
             @AuthenticationPrincipal User user,
@@ -34,18 +37,24 @@ public class ExtratoController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
 
-        List<Account> contas = "ADMIN".equals(user.getType())
+        // -> REFATORADO: Uso do método isAdmin() para maior clareza e consistência.
+        // A lógica de negócio para determinar quais contas são visíveis é mantida.
+        List<Account> visibleAccounts = user.isAdmin()
                 ? accountService.findAll()
                 : accountService.findByUser(user);
 
-        model.addAttribute("user", user);
+        // -> REFATORADO: Lógica de seleção de conta padrão separada para melhor legibilidade.
+        UUID selectedAccountId = accountId;
+        if (selectedAccountId == null && !visibleAccounts.isEmpty()) {
+            selectedAccountId = visibleAccounts.get(0).getId();
+        }
 
-        UUID selectedAccountId = accountId != null ? accountId : (contas.isEmpty() ? null : contas.get(0).getId());
-
+        // A chamada ao serviço para buscar as transações permanece a mesma.
         List<Transaction> extrato = extratoService.getExtrato(selectedAccountId, start, end);
 
+        model.addAttribute("user", user);
         model.addAttribute("extrato", extrato);
-        model.addAttribute("filterableAccounts", contas);
+        model.addAttribute("filterableAccounts", visibleAccounts);
         model.addAttribute("selectedAccountId", selectedAccountId);
         model.addAttribute("start", start);
         model.addAttribute("end", end);
