@@ -2,6 +2,8 @@ package com.example.demo.models.users;
 
 import com.example.demo.models.accounts.Account;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,9 +26,18 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @NotBlank(message = "O nome é obrigatório.")
+    @Size(min = 3, message = "O nome deve ter no mínimo 3 caracteres.")
     private String name;
+
+    @NotBlank(message = "A senha é obrigatória.")
+    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres.")
     private String password;
+
+    @NotBlank(message = "O login é obrigatório.")
     private String login;
+
+    @NotBlank(message = "O tipo de usuário é obrigatório.")
     private String type;
 
     @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE,

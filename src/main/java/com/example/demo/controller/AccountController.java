@@ -5,11 +5,16 @@ import com.example.demo.models.enums.AccountType;
 import com.example.demo.models.users.User;
 import com.example.demo.service.AccountService;
 import com.example.demo.service.UserService;
+import org.springframework.ui.Model;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize; // -> Importação necessária
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -38,8 +43,6 @@ public class AccountController {
         int pageSize = 10;
         Page<Account> contasPage;
 
-        // Lógica de negócio mantida: admin vê dados diferentes do usuário comum.
-        // A verificação foi melhorada para usar o método do próprio usuário.
         if (user.isAdmin()) {
             contasPage = accountService.findPaginated(page, pageSize);
             mav.addObject("usuarios", userService.findAll());
@@ -52,6 +55,9 @@ public class AccountController {
         mav.addObject("contasCurrentPage", page);
         mav.addObject("conta", new Account());
         mav.addObject("user", user);
+
+        // 🔥 precisa adicionar sempre
+        mav.addObject("tiposConta", AccountType.values());
 
         return mav;
     }
@@ -67,12 +73,34 @@ public class AccountController {
 
     // Salvar nova conta
     @PostMapping("/nova")
-    public String salvarConta(@ModelAttribute Account account,
+    public String salvarConta(@Valid @ModelAttribute("conta") Account account,
+                              BindingResult result, // Deve vir LOGO APÓS o objeto que está sendo validado
                               @RequestParam(required = false) UUID userId,
                               @AuthenticationPrincipal User currentUser,
-                              RedirectAttributes attr) {
+                              RedirectAttributes attr,
+                              Model model) { // Usado para devolver dados à view em caso de erro
 
-        // Lógica de negócio mantida: admin pode criar conta para outros.
+        // PASSO 1: VERIFICAR SE HÁ ERROS DE VALIDAÇÃO
+        if (result.hasErrors()) {
+            Page<Account> contasPage = currentUser.isAdmin()
+                    ? accountService.findPaginated(0, 10)
+                    : accountService.findByUserPaginated(currentUser, 0, 10);
+
+            model.addAttribute("contas", contasPage.getContent());
+            model.addAttribute("contasTotalPages", contasPage.getTotalPages());
+            model.addAttribute("contasCurrentPage", 0);
+            model.addAttribute("tiposConta", AccountType.values());
+            model.addAttribute("user", currentUser);
+
+            // 🔥 Se for admin, precisa repopular a lista de usuários
+            if (currentUser.isAdmin()) {
+                model.addAttribute("usuarios", userService.findAll());
+            }
+
+            return "user/contas";
+        }
+
+        // PASSO 2: SE NÃO HOUVER ERROS, A LÓGICA ORIGINAL CONTINUA
         if (currentUser.isAdmin() && userId != null) {
             User selectedUser = userService.findByIdOrThrow(userId);
             account.setUser(selectedUser);
